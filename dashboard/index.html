@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<!--
+  Dashboard comparativo: Python, Java y JavaScript.
+  Estructura de la página: Ian.
+
+  Cómo abrirlo (desde la carpeta javascript/):
+      npm start
+  y entrar a http://localhost:3000/dashboard
+
+  Se sirve desde el servidor Express para que el navegador pueda leer los resultados_metricas.json y el código
+  (sin errores de CORS). Cada sección tiene un contenedor con un id; el archivo JS de cada integrante lo llena:
+
+      #resumen, #comparativa ........ js/tabla.js        (Ian)
+      #rendimiento .................. js/graficas.js     (Leonardo)  Chart.js
+      #arquitectura ................. js/diagramas.js    (Yurem)     Mermaid.js
+      #analisis ..................... js/tarjetas.js     (Edsson)
+      carga de los datos ............ js/datos.js        (Edsson)    avisa con el evento «metricas-listas»
+-->
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Comparativo de lenguajes</title>
+  <meta name="description" content="Comparación de la automatización de pedidos hecha en Python, Java y JavaScript: resultado, tamaño del código, rendimiento, arquitectura y análisis.">
+  <link rel="icon" href="data:,">
+  <link rel="stylesheet" href="css/estilos.css">
+
+  <!-- Librerías desde el CDN, con versión fija y verificación de integridad (SRI). -->
+  <script defer src="https://cdn.jsdelivr.net/npm/chart.js@4.5.1/dist/chart.umd.min.js"
+          integrity="sha384-jb8JQMbMoBUzgWatfe6COACi2ljcDdZQ2OxczGA3bGNeWe+6DChMTBJemed7ZnvJ"
+          crossorigin="anonymous"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/mermaid@11.12.0/dist/mermaid.min.js"
+          integrity="sha384-o+g/BxPwhi0C3RK7oQBxQuNimeafQ3GE/ST4iT2BxVI4Wzt60SH4pq9iXVYujjaS"
+          crossorigin="anonymous"></script>
+
+  <!-- Código propio. «defer» los ejecuta en este orden cuando la página ya está armada. -->
+  <script defer src="js/utiles.js"></script>
+  <script defer src="js/tabla.js"></script>
+  <script defer src="js/graficas.js"></script>
+  <script defer src="js/definiciones.js"></script>
+  <script defer src="js/diagramas.js"></script>
+  <script defer src="js/tarjetas.js"></script>
+  <!-- Copia fija de los datos (la genera exportar_estatico.js): solo se usa si no hay servidor. -->
+  <script defer src="datos/datos-fijos.js"></script>
+  <script defer src="js/datos.js"></script>
+</head>
+<body>
+  <a class="saltar" href="#contenido">Saltar al contenido</a>
+
+  <header class="cabecera">
+    <div class="pagina cabecera-interior">
+      <div>
+        <p class="etiqueta">Proyecto final · Problema 2</p>
+        <h1>El mismo sistema en Python, Java y JavaScript</h1>
+        <p class="secundario">
+          Automatización de pedidos de una tienda. Las tres versiones calculan los mismos importes; aquí se comparan
+          su resultado, su tamaño, su velocidad y cómo están diseñadas.
+        </p>
+      </div>
+      <button type="button" id="boton-recargar" class="boton">Recargar datos</button>
+    </div>
+    <nav class="pagina indice" aria-label="Secciones de la página">
+      <a href="#resumen">Resultado</a>
+      <a href="#comparativa">Comparativa</a>
+      <a href="#rendimiento">Rendimiento</a>
+      <a href="#arquitectura">Arquitectura</a>
+      <a href="#analisis">Análisis</a>
+    </nav>
+  </header>
+
+  <main id="contenido" class="pagina">
+    <p id="estado" class="estado" role="status">Cargando métricas…</p>
+
+    <!-- 1. Resultado producido por las tres versiones (js/tabla.js) -->
+    <section id="resumen" aria-labelledby="titulo-resumen">
+      <h2 id="titulo-resumen">Resultado producido</h2>
+      <div id="resumen-cifras" class="resumen">
+        <p class="pendiente">Esperando los resultados de las tres versiones…</p>
+      </div>
+      <p id="coincidencia" class="coincidencia"></p>
+    </section>
+
+    <!-- 2. Tabla comparativa con filtro por lenguaje (js/tabla.js) -->
+    <section id="comparativa" aria-labelledby="titulo-comparativa">
+      <h2 id="titulo-comparativa">Comparativa de características</h2>
+      <p class="secundario">
+        Las líneas de código (LOC) se cuentan leyendo el código real de cada carpeta: sin líneas en
+        blanco ni comentarios. Elige un lenguaje para ver solo su fila o toca el título de una columna para ordenar.
+      </p>
+      <div class="fila-controles">
+        <div id="filtro-lenguaje" class="segmentado" role="group" aria-label="Filtrar por lenguaje"></div>
+      </div>
+      <div class="tarjeta tabla-contenedor">
+        <table id="tabla-comparativa"></table>
+      </div>
+      <p id="nota-tabla" class="secundario nota"></p>
+    </section>
+
+    <!-- 3. Gráficas de rendimiento con Chart.js (js/graficas.js) -->
+    <section id="rendimiento" aria-labelledby="titulo-rendimiento">
+      <h2 id="titulo-rendimiento">Rendimiento</h2>
+      <p class="secundario">
+        Cada cambio de estado de un pedido espera 100 ms para simular el almacén o la paquetería. Por eso lo que se
+        mide en las gráficas es, sobre todo, cuánto logra cada lenguaje traslapar esas esperas.
+      </p>
+      <ul id="leyenda-lenguajes" class="leyenda" aria-label="Colores de los lenguajes">
+        <li><span class="muestra serie-python"></span>Python</li>
+        <li><span class="muestra serie-java"></span>Java</li>
+        <li><span class="muestra serie-javascript"></span>JavaScript</li>
+        <li><span class="muestra serie-base"></span>Secuencial (línea base)</li>
+      </ul>
+
+      <div class="rejilla-graficas">
+        <article class="tarjeta">
+          <h3>Secuencial frente a concurrente</h3>
+          <p class="secundario">Milisegundos para llevar los 4 pedidos válidos del archivo de prueba hasta «Entregado». Menos es mejor.</p>
+          <div class="caja-grafica"><canvas id="grafica-modos" role="img" aria-label="Barras: tiempo secuencial y concurrente por lenguaje"></canvas></div>
+          <details class="gemela"><summary>Ver como tabla</summary><div id="tabla-modos" class="tabla-contenedor"></div></details>
+        </article>
+
+        <article class="tarjeta">
+          <h3>Tiempo de cómputo real por etapa</h3>
+          <p class="secundario">Lo que de verdad tarda cada paso, sin las esperas simuladas. Escala logarítmica: cada línea horizontal vale diez veces la anterior.</p>
+          <div class="caja-grafica"><canvas id="grafica-etapas" role="img" aria-label="Barras: milisegundos de lectura, validación y consultas por lenguaje"></canvas></div>
+          <details class="gemela"><summary>Ver como tabla</summary><div id="tabla-etapas" class="tabla-contenedor"></div></details>
+        </article>
+
+        <article class="tarjeta ancha">
+          <h3>Qué pasa cuando crece el volumen de pedidos</h3>
+          <p class="secundario">
+            Mismos pedidos del archivo de prueba repetidos hasta llegar a cada volumen y medidos en esta computadora
+            (<code>node dashboard/medir_volumenes.js</code>).
+          </p>
+          <div class="fila-controles">
+            <div id="selector-volumen" class="segmentado" role="radiogroup" aria-label="Qué medir">
+              <button type="button" role="radio" aria-checked="true" data-medida="concurrente_ms">Concurrente (ms)</button>
+              <button type="button" role="radio" aria-checked="false" data-medida="secuencial_ms">Secuencial (ms)</button>
+              <button type="button" role="radio" aria-checked="false" data-medida="aceleracion">Aceleración (×)</button>
+            </div>
+          </div>
+          <div class="caja-grafica alta"><canvas id="grafica-volumen" role="img" aria-label="Líneas: tiempo según el número de pedidos, por lenguaje"></canvas></div>
+          <details class="gemela"><summary>Ver como tabla</summary><div id="tabla-volumen" class="tabla-contenedor"></div></details>
+          <p id="lectura-volumen" class="lectura"></p>
+        </article>
+      </div>
+    </section>
+
+    <!-- 4. Diagramas con Mermaid.js (js/diagramas.js) -->
+    <section id="arquitectura" aria-labelledby="titulo-arquitectura">
+      <h2 id="titulo-arquitectura">Arquitectura y flujo</h2>
+      <div class="rejilla-diagramas">
+        <article class="tarjeta ancha">
+          <h3>Arquitectura MVC</h3>
+          <p class="secundario">La vista es lo que ve el usuario, el controlador traduce sus acciones y el modelo guarda las reglas del negocio. Cada lenguaje tiene su vista y su controlador; todos aplican las mismas reglas.</p>
+          <div id="diagrama-mvc" class="diagrama" aria-live="polite"><p class="pendiente">Dibujando el diagrama…</p></div>
+        </article>
+
+        <article class="tarjeta ancha">
+          <h3>Inicio de sesión contra usuarios.json</h3>
+          <p class="secundario">Igual en los tres lenguajes. La contraseña se guarda y se compara en texto plano solo porque es un proyecto de estudio.</p>
+          <div id="diagrama-login" class="diagrama" aria-live="polite"><p class="pendiente">Dibujando el diagrama…</p></div>
+        </article>
+
+        <article class="tarjeta ancha">
+          <h3>Flujo de concurrencia al procesar la cola</h3>
+          <p class="secundario">Mismo objetivo, tres maneras de avisarle a la pantalla que un pedido cambió de estado.</p>
+          <div id="pestanas-concurrencia" class="segmentado" role="tablist" aria-label="Lenguaje del diagrama">
+            <button type="button" role="tab" aria-selected="true" data-lenguaje="Python">Python</button>
+            <button type="button" role="tab" aria-selected="false" data-lenguaje="Java">Java</button>
+            <button type="button" role="tab" aria-selected="false" data-lenguaje="JavaScript">JavaScript</button>
+          </div>
+          <div id="diagrama-concurrencia" class="diagrama" role="tabpanel" aria-live="polite"><p class="pendiente">Dibujando el diagrama…</p></div>
+          <p id="explicacion-concurrencia" class="lectura"></p>
+        </article>
+      </div>
+    </section>
+
+    <!-- 5. Análisis cualitativo (js/tarjetas.js) -->
+    <section id="analisis" aria-labelledby="titulo-analisis">
+      <h2 id="titulo-analisis">Ventajas y limitaciones</h2>
+      <p class="secundario">Lo que vimos al construir las tres versiones, explicado como se contaría en clase.</p>
+      <div id="tarjetas-lenguajes" class="rejilla-tarjetas"><p class="pendiente">Preparando las tarjetas…</p></div>
+      <h3 class="subtitulo">Tres preguntas para la clase</h3>
+      <div id="preguntas-clase" class="rejilla-preguntas"></div>
+    </section>
+  </main>
+
+  <footer class="pagina pie">
+    <p>
+      Datos: <code>python/</code>, <code>java/</code> y <code>javascript/</code> (<code>resultados_metricas.json</code> y código fuente),
+      <code>dashboard/datos/volumenes.json</code> (mediciones por volumen). Cómo arrancar cada interfaz está en el
+      README del proyecto.
+    </p>
+  </footer>
+</body>
+</html>

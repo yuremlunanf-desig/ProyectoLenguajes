@@ -1,0 +1,256 @@
+/*
+ * Estilos del dashboard comparativo.
+ * Responsable: Ian.
+ *
+ * Los colores son variables (--nombre) definidas una sola vez arriba; el modo oscuro solo cambia sus valores.
+ * Cada lenguaje tiene SIEMPRE el mismo color en toda la página (tabla, gráficas, tarjetas):
+ *   Python = azul, Java = naranja, JavaScript = verde agua. El gris (--serie-base) es la línea base «secuencial».
+ * Esta paleta se validó para daltonismo; por eso nunca se usa el color como única pista: siempre hay texto.
+ */
+
+:root {
+  color-scheme: light;
+  --plano: #f9f9f7;
+  --superficie: #fcfcfb;
+  --tinta: #0b0b0b;
+  --tinta-2: #52514e;
+  --tenue: #6b6a65;
+  --linea: #e1e0d9;
+  --eje: #c3c2b7;
+  --borde: rgba(11, 11, 11, 0.10);
+  --acento: #2a78d6;
+  --bien: #006300;
+  --mal: #d03b3b;
+
+  --serie-python: #2a78d6;
+  --serie-java: #eb6834;
+  --serie-javascript: #1baf7a;
+  --serie-base: #898781;
+}
+
+/* Oscuro: por el sistema (si nadie eligió tema) o porque quien ve la página lo eligió con data-theme="dark". */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+    --plano: #0d0d0d;
+    --superficie: #1a1a19;
+    --tinta: #f0efec;
+    --tinta-2: #c3c2b7;
+    --tenue: #a09f98;
+    --linea: #2c2c2a;
+    --eje: #383835;
+    --borde: rgba(255, 255, 255, 0.10);
+    --acento: #3987e5;
+    --bien: #0ca30c;
+
+    --serie-python: #3987e5;
+    --serie-java: #d95926;
+    --serie-javascript: #199e70;
+  }
+}
+
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --plano: #0d0d0d;
+  --superficie: #1a1a19;
+  --tinta: #f0efec;
+  --tinta-2: #c3c2b7;
+  --tenue: #a09f98;
+  --linea: #2c2c2a;
+  --eje: #383835;
+  --borde: rgba(255, 255, 255, 0.10);
+  --acento: #3987e5;
+  --bien: #0ca30c;
+
+  --serie-python: #3987e5;
+  --serie-java: #d95926;
+  --serie-javascript: #199e70;
+}
+
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+
+html { scroll-behavior: smooth; scroll-padding-top: 16px; }
+
+body {
+  margin: 0;
+  background: var(--plano);
+  color: var(--tinta);
+  font: 15px/1.55 system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+
+h1, h2, h3, p { margin: 0; }
+h1 { font-size: 26px; line-height: 1.2; margin: 4px 0 8px; }
+h2 { font-size: 20px; margin-bottom: 6px; }
+h3 { font-size: 16px; margin-bottom: 4px; }
+code { font-family: ui-monospace, Consolas, monospace; font-size: 0.92em; }
+a { color: var(--acento); }
+:focus-visible { outline: 2px solid var(--acento); outline-offset: 2px; }
+
+.secundario { color: var(--tinta-2); font-size: 14px; }
+.etiqueta { color: var(--tenue); font-size: 13px; text-transform: uppercase; letter-spacing: 0.04em; }
+.pendiente { color: var(--tenue); font-size: 14px; }
+.nota { margin-top: 8px; }
+
+.saltar {
+  position: absolute; left: 8px; top: -48px; z-index: 20;
+  background: var(--superficie); padding: 8px 12px; border-radius: 6px; border: 1px solid var(--eje);
+}
+.saltar:focus { top: 8px; }
+
+/* ---------- Estructura ---------- */
+
+/* minmax(0, 1fr): el contenido ancho (tablas, diagramas) se desplaza dentro de su tarjeta sin ensanchar la página. */
+.pagina { width: 100%; max-width: 1120px; margin: 0 auto; padding: 0 16px; }
+
+.cabecera { background: var(--superficie); border-bottom: 1px solid var(--borde); padding-top: 24px; }
+.cabecera-interior { display: flex; flex-wrap: wrap; gap: 16px 32px; align-items: flex-start; justify-content: space-between; }
+.cabecera-interior > div { max-width: 760px; }
+
+.indice { display: flex; flex-wrap: wrap; gap: 4px 20px; padding-top: 12px; padding-bottom: 10px; }
+.indice a { color: var(--tinta-2); text-decoration: none; font-size: 14px; padding: 4px 0; border-bottom: 2px solid transparent; }
+.indice a:hover { color: var(--tinta); border-bottom-color: var(--eje); }
+
+main { padding-top: 16px; padding-bottom: 32px; display: grid; grid-template-columns: minmax(0, 1fr); gap: 36px; }
+section { display: grid; grid-template-columns: minmax(0, 1fr); gap: 12px; align-content: start; }
+.estado { color: var(--tinta-2); font-size: 14px; min-height: 21px; }
+.estado.error { color: var(--mal); font-weight: 600; }
+
+.pie { padding-bottom: 40px; color: var(--tinta-2); font-size: 13px; }
+
+/* ---------- Tarjetas, botones y controles ---------- */
+
+.tarjeta {
+  background: var(--superficie);
+  border: 1px solid var(--borde);
+  border-radius: 10px;
+  padding: 16px;
+  min-width: 0;
+}
+
+.boton, .segmentado button {
+  font: inherit;
+  color: var(--tinta);
+  background: var(--superficie);
+  border: 1px solid var(--eje);
+  border-radius: 6px;
+  padding: 6px 12px;
+  cursor: pointer;
+}
+.boton:hover, .segmentado button:hover { border-color: var(--tenue); }
+
+.fila-controles { display: flex; flex-wrap: wrap; gap: 8px 16px; align-items: center; }
+
+/* Grupo de botones donde solo uno está activo (filtros y pestañas). */
+.segmentado { display: inline-flex; flex-wrap: wrap; gap: 4px; }
+.segmentado button[aria-pressed="true"],
+.segmentado button[aria-checked="true"],
+.segmentado button[aria-selected="true"] {
+  background: var(--tinta);
+  color: var(--superficie);
+  border-color: var(--tinta);
+  font-weight: 600;
+}
+
+/* ---------- Resultado producido ---------- */
+
+.resumen { display: grid; gap: 12px; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); }
+.resumen .tarjeta { display: grid; gap: 2px; align-content: start; }
+.resumen .tarjeta.principal { grid-column: span 2; }
+.cifra { font-size: 48px; line-height: 1.1; font-weight: 600; }
+.cifra.media { font-size: 28px; }
+.cifra-etiqueta { color: var(--tinta-2); font-size: 14px; }
+
+.coincidencia { display: flex; gap: 8px; align-items: flex-start; font-size: 14px; }
+.icono {
+  flex: none; width: 20px; height: 20px; border-radius: 50%;
+  display: grid; place-items: center;
+  color: #ffffff; font-size: 12px; font-weight: 700; line-height: 1;
+}
+.icono.bien { background: var(--bien); }
+.icono.mal { background: var(--mal); }
+
+/* ---------- Tablas ---------- */
+
+.tabla-contenedor { overflow-x: auto; }
+table { border-collapse: collapse; width: 100%; font-size: 14px; }
+th, td { padding: 8px; text-align: left; border-bottom: 1px solid var(--linea); vertical-align: top; }
+thead th { color: var(--tinta-2); font-weight: 600; font-size: 13px; border-bottom-color: var(--eje); vertical-align: bottom; }
+thead th button {
+  all: unset; cursor: pointer; display: inline; text-align: inherit;
+}
+thead th button span { margin-left: 4px; }
+thead th button:hover { color: var(--tinta); text-decoration: underline; }
+thead th button:focus-visible { outline: 2px solid var(--acento); outline-offset: 2px; }
+tbody th { font-weight: 600; white-space: nowrap; }
+tbody tr:last-child th, tbody tr:last-child td { border-bottom: 0; }
+tbody tr:hover { background: color-mix(in srgb, var(--tinta) 4%, transparent); }
+.numero { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.fuerte { font-weight: 600; }
+
+/* Muestra de color junto al nombre de un lenguaje. */
+.muestra { display: inline-block; width: 10px; height: 10px; border-radius: 2px; margin-right: 8px; }
+.serie-python { background: var(--serie-python); }
+.serie-java { background: var(--serie-java); }
+.serie-javascript { background: var(--serie-javascript); }
+.serie-base { background: var(--serie-base); }
+
+/* Dificultad percibida: cinco puntos + la palabra (nunca solo color). */
+.puntos { display: inline-flex; gap: 3px; margin-right: 8px; vertical-align: middle; }
+.punto { width: 9px; height: 9px; border-radius: 50%; border: 1.5px solid var(--tenue); }
+.punto.lleno { background: var(--tinta); border-color: var(--tinta); }
+.motivo { display: block; color: var(--tinta-2); font-size: 13px; font-weight: 400; margin-top: 2px; min-width: 200px; white-space: normal; }
+
+/* ---------- Gráficas ---------- */
+
+.leyenda { display: flex; flex-wrap: wrap; gap: 6px 18px; list-style: none; margin: 0; padding: 0; font-size: 14px; color: var(--tinta-2); }
+.leyenda li { display: flex; align-items: center; }
+
+.rejilla-graficas { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 460px), 1fr)); gap: 16px; }
+.rejilla-graficas .ancha, .rejilla-diagramas .ancha { grid-column: 1 / -1; }
+
+/* La altura incluye el eje X: la caja es más alta que el área de barras. */
+.caja-grafica { position: relative; height: 300px; margin-top: 12px; }
+.caja-grafica.alta { height: 360px; }
+.caja-grafica.sin-datos { height: auto; }
+
+.gemela { margin-top: 12px; font-size: 14px; }
+.gemela summary { cursor: pointer; color: var(--tinta-2); }
+.gemela .tabla-contenedor { margin-top: 8px; }
+.lectura { margin-top: 10px; font-size: 14px; color: var(--tinta-2); }
+.aviso-libreria { color: var(--mal); font-size: 14px; }
+
+/* ---------- Diagramas ---------- */
+
+.rejilla-diagramas { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 520px), 1fr)); gap: 16px; }
+.diagrama { overflow-x: auto; margin-top: 12px; }
+.diagrama svg { max-width: 100%; height: auto; display: block; margin: 0 auto; }
+#pestanas-concurrencia { margin-top: 8px; }
+
+/* ---------- Tarjetas de análisis ---------- */
+
+.rejilla-tarjetas { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr)); gap: 16px; }
+.tarjeta-lenguaje { border-top: 4px solid var(--serie-base); display: grid; gap: 10px; align-content: start; }
+.tarjeta-lenguaje.python { border-top-color: var(--serie-python); }
+.tarjeta-lenguaje.java { border-top-color: var(--serie-java); }
+.tarjeta-lenguaje.javascript { border-top-color: var(--serie-javascript); }
+.tarjeta-lenguaje h3 { font-size: 18px; margin: 0; }
+.tarjeta-lenguaje h4 { margin: 4px 0 4px; font-size: 14px; }
+.tarjeta-lenguaje ul { margin: 0; padding-left: 20px; }
+.tarjeta-lenguaje li { margin-bottom: 4px; }
+.dato-real { font-size: 13px; color: var(--tinta-2); border-top: 1px solid var(--linea); padding-top: 8px; }
+
+.subtitulo { margin-top: 12px; }
+.rejilla-preguntas { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr)); gap: 16px; }
+.pregunta h4 { margin: 0 0 6px; font-size: 15px; }
+.pregunta p { font-size: 14px; color: var(--tinta-2); }
+
+@media (max-width: 560px) {
+  h1 { font-size: 22px; }
+  .cifra { font-size: 40px; }
+  .resumen .tarjeta.principal { grid-column: auto; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+}
