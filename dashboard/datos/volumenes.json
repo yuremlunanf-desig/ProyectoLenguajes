@@ -1,0 +1,150 @@
+{
+  "generado": "2026-11-14T04:32:29.347Z",
+  "equipo": {
+    "sistema": "Windows_NT 10.0.26200",
+    "procesadores": 32,
+    "runtimes": {
+      "Python": "Python 3.14.7",
+      "Java": "Java 25.0.4",
+      "JavaScript": "Node.js 24.21.0"
+    }
+  },
+  "retardo_por_transicion_ms": 100,
+  "nota": "Cada volumen repite los pedidos de solicitudes_pequenas.json (el 20 % es inválido y se rechaza). El tiempo secuencial crece con el número de pedidos; el concurrente depende de cuántas tareas puede atender a la vez cada lenguaje.",
+  "volumenes": [
+    5,
+    100,
+    200,
+    300,
+    400
+  ],
+  "totales_coinciden": true,
+  "resultados": {
+    "Python": [
+      {
+        "pedidos": 5,
+        "registrados": 4,
+        "secuencial_ms": 978.176,
+        "concurrente_ms": 320.923,
+        "aceleracion": 3.05,
+        "total_vendido": "8360.46"
+      },
+      {
+        "pedidos": 100,
+        "registrados": 80,
+        "secuencial_ms": 19316.177,
+        "concurrente_ms": 317.522,
+        "aceleracion": 60.83,
+        "total_vendido": "167209.20"
+      },
+      {
+        "pedidos": 200,
+        "registrados": 160,
+        "secuencial_ms": 38951.884,
+        "concurrente_ms": 323.819,
+        "aceleracion": 120.29,
+        "total_vendido": "334418.40"
+      },
+      {
+        "pedidos": 300,
+        "registrados": 240,
+        "secuencial_ms": 58482.542,
+        "concurrente_ms": 328.324,
+        "aceleracion": 178.12,
+        "total_vendido": "501627.60"
+      },
+      {
+        "pedidos": 400,
+        "registrados": 320,
+        "secuencial_ms": 77922.604,
+        "concurrente_ms": 328.735,
+        "aceleracion": 237.04,
+        "total_vendido": "668836.80"
+      }
+    ],
+    "Java": [
+      {
+        "pedidos": 5,
+        "registrados": 4,
+        "secuencial_ms": 909.515,
+        "concurrente_ms": 309.218,
+        "aceleracion": 2.94,
+        "total_vendido": "8360.46"
+      },
+      {
+        "pedidos": 100,
+        "registrados": 80,
+        "secuencial_ms": 19212.724,
+        "concurrente_ms": 1423.732,
+        "aceleracion": 13.49,
+        "total_vendido": "167209.20"
+      },
+      {
+        "pedidos": 200,
+        "registrados": 160,
+        "secuencial_ms": 38954.793,
+        "concurrente_ms": 2593.44,
+        "aceleracion": 15.02,
+        "total_vendido": "334418.40"
+      },
+      {
+        "pedidos": 300,
+        "registrados": 240,
+        "secuencial_ms": 58493.275,
+        "concurrente_ms": 3781.218,
+        "aceleracion": 15.47,
+        "total_vendido": "501627.60"
+      },
+      {
+        "pedidos": 400,
+        "registrados": 320,
+        "secuencial_ms": 77771.175,
+        "concurrente_ms": 5002.56,
+        "aceleracion": 15.55,
+        "total_vendido": "668836.80"
+      }
+    ],
+    "JavaScript": [
+      {
+        "pedidos": 5,
+        "registrados": 4,
+        "secuencial_ms": 976.014,
+        "concurrente_ms": 320.486,
+        "aceleracion": 3.05,
+        "total_vendido": "8360.46"
+      },
+      {
+        "pedidos": 100,
+        "registrados": 80,
+        "secuencial_ms": 19138.446,
+        "concurrente_ms": 318.802,
+        "aceleracion": 60.03,
+        "total_vendido": "167209.20"
+      },
+      {
+        "pedidos": 200,
+        "registrados": 160,
+        "secuencial_ms": 38928.411,
+        "concurrente_ms": 320.921,
+        "aceleracion": 121.3,
+        "total_vendido": "334418.40"
+      },
+      {
+        "pedidos": 300,
+        "registrados": 240,
+        "secuencial_ms": 58452.051,
+        "concurrente_ms": 323.684,
+        "aceleracion": 180.58,
+        "total_vendido": "501627.60"
+      },
+      {
+        "pedidos": 400,
+        "registrados": 320,
+        "secuencial_ms": 77923.571,
+        "concurrente_ms": 325.939,
+        "aceleracion": 239.07,
+        "total_vendido": "668836.80"
+      }
+    ]
+  }
+}
