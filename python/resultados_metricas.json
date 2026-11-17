@@ -1,0 +1,141 @@
+{
+  "lenguaje": "Python",
+  "runtime": "Python 3.14.7",
+  "modelo_concurrencia": "asyncio (corrutinas con asyncio.gather)",
+  "fecha_ejecucion": "2026-11-13T21:00:38",
+  "archivo_entrada": "solicitudes_pequenas.json",
+  "pedidos": {
+    "leidos": 5,
+    "registrados": 4,
+    "rechazados": 1
+  },
+  "rechazos": [
+    {
+      "id": "PED-005",
+      "motivo": "El pedido PED-005 tiene una cantidad inválida (0) en el producto WEB-909: debe ser un entero mayor que 0."
+    }
+  ],
+  "retardo_por_transicion_ms": 100,
+  "tiempos_ms": {
+    "lectura_json": 0.497,
+    "validacion_y_calculo": 0.24,
+    "consultas_funcionales": 0.035,
+    "cambio_estados_secuencial": 973.349,
+    "cambio_estados_concurrente": 333.159,
+    "total": 1307.912
+  },
+  "aceleracion_concurrencia": 2.92,
+  "ventas": {
+    "subtotal": "7548.30",
+    "descuentos": "634.11",
+    "iva": "1106.27",
+    "envio": "340.00",
+    "total": "8360.46"
+  },
+  "consultas": {
+    "cliente": "C001",
+    "pedidos_del_cliente": [
+      "PED-001",
+      "PED-004"
+    ],
+    "pendientes": [
+      "PED-001",
+      "PED-002"
+    ],
+    "orden_por_fecha": [
+      "PED-002",
+      "PED-004",
+      "PED-001",
+      "PED-003"
+    ],
+    "orden_por_prioridad": [
+      "PED-002",
+      "PED-003",
+      "PED-001",
+      "PED-004"
+    ]
+  },
+  "estados_iniciales": {
+    "PENDIENTE": 2,
+    "EN_PROCESO": 1,
+    "ENVIADO": 1
+  },
+  "estados_finales": {
+    "ENTREGADO": 4
+  },
+  "detalle_pedidos": [
+    {
+      "id": "PED-001",
+      "cliente": "Ana Torres",
+      "prioridad": "MEDIA",
+      "tipo_envio": "ESTANDAR",
+      "subtotal": "2148.90",
+      "descuento": "214.89",
+      "iva": "309.44",
+      "envio": "50.00",
+      "total": "2293.45",
+      "estado_inicial": "PENDIENTE",
+      "estado_final": "ENTREGADO",
+      "transiciones": [
+        "PENDIENTE->EN_PROCESO",
+        "EN_PROCESO->ENVIADO",
+        "ENVIADO->ENTREGADO"
+      ],
+      "duracion_ms": 332.984
+    },
+    {
+      "id": "PED-002",
+      "cliente": "Luis Méndez",
+      "prioridad": "ALTA",
+      "tipo_envio": "EXPRESS",
+      "subtotal": "885.30",
+      "descuento": "44.27",
+      "iva": "134.56",
+      "envio": "120.00",
+      "total": "1095.59",
+      "estado_inicial": "PENDIENTE",
+      "estado_final": "ENTREGADO",
+      "transiciones": [
+        "PENDIENTE->EN_PROCESO",
+        "EN_PROCESO->ENVIADO",
+        "ENVIADO->ENTREGADO"
+      ],
+      "duracion_ms": 332.987
+    },
+    {
+      "id": "PED-003",
+      "cliente": "Sofía Ramírez",
+      "prioridad": "ALTA",
+      "tipo_envio": "EXPRESS",
+      "subtotal": "3749.50",
+      "descuento": "374.95",
+      "iva": "539.93",
+      "envio": "120.00",
+      "total": "4034.48",
+      "estado_inicial": "EN_PROCESO",
+      "estado_final": "ENTREGADO",
+      "transiciones": [
+        "EN_PROCESO->ENVIADO",
+        "ENVIADO->ENTREGADO"
+      ],
+      "duracion_ms": 220.27
+    },
+    {
+      "id": "PED-004",
+      "cliente": "Ana Torres",
+      "prioridad": "BAJA",
+      "tipo_envio": "ESTANDAR",
+      "subtotal": "764.60",
+      "descuento": "0.00",
+      "iva": "122.34",
+      "envio": "50.00",
+      "total": "936.94",
+      "estado_inicial": "ENVIADO",
+      "estado_final": "ENTREGADO",
+      "transiciones": [
+        "ENVIADO->ENTREGADO"
+      ],
+      "duracion_ms": 108.653
+    }
+  ]
+}
