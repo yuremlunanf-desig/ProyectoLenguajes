@@ -1,0 +1,863 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Análisis comparativo: pedidos en Python, Java y JavaScript</title>
+<style>
+  /* ===== Página y tipografía editorial (A4, márgenes de 2.5 cm, interlineado 1.45) ===== */
+  @page {
+    size: A4;
+    margin: 25mm;
+    @top-right { content: "Gestión concurrente de pedidos · Python, Java y JavaScript"; font: 8pt Calibri, "Segoe UI", sans-serif; color: #777; }
+    @bottom-center { content: counter(page); font: 9pt Cambria, Georgia, serif; color: #555; }
+  }
+  @page :first { margin: 0; @top-right { content: none; } @bottom-center { content: none; } }
+
+  :root { --tinta: #1d1d1f; --azul: #1f3a5f; --gris: #5b5b5b; --linea: #cfd6df; --fondo-cod: #f4f6f9; --py: #2a78d6; --jv: #d95926; --js: #199e70; }
+  * { box-sizing: border-box; }
+  html { font-size: 10pt; }
+  body { margin: 0; color: var(--tinta); font-family: Cambria, Georgia, "Times New Roman", serif; line-height: 1.45; }
+  p { margin: 0 0 5pt; text-align: justify; orphans: 3; widows: 3; }
+  ul, ol { margin: 0 0 6pt; padding-left: 16pt; }
+  li { margin-bottom: 2pt; text-align: justify; }
+  strong { color: #111; }
+  code { font-family: Consolas, "Courier New", monospace; font-size: 0.88em; background: var(--fondo-cod); padding: 0 1.5pt; border-radius: 2pt; line-height: 1.2; }
+
+  h2 { font: bold 14pt Calibri, "Segoe UI", sans-serif; color: var(--azul); margin: 14pt 0 6pt; padding-bottom: 2pt; border-bottom: 1.5pt solid var(--azul); break-after: avoid; }
+  h3 { font: bold 11pt Calibri, "Segoe UI", sans-serif; color: var(--azul); margin: 9pt 0 4pt; break-after: avoid; }
+  h2.nueva-pagina { break-before: page; margin-top: 0; }
+
+  /* ===== Portada ===== */
+  .portada { height: 296mm; padding: 34mm 26mm 22mm; display: flex; flex-direction: column; break-after: page; border-top: 14mm solid var(--azul); }
+  .portada p { text-align: left; }
+  .portada .inst { font: bold 17pt Calibri, "Segoe UI", sans-serif; color: var(--azul); letter-spacing: .4pt; text-transform: uppercase; margin: 0; }
+  .portada .esc { font: 13pt Calibri, "Segoe UI", sans-serif; color: var(--gris); margin: 2pt 0 0; }
+  .portada .prog { font: 12pt Calibri, "Segoe UI", sans-serif; margin: 22pt 0 0; }
+  .portada .titulo { font: bold 25pt/1.2 Calibri, "Segoe UI", sans-serif; color: #111; margin: 62mm 0 8pt; }
+  .portada .sub { font: 14pt Calibri, "Segoe UI", sans-serif; color: var(--gris); margin: 0; }
+  .portada .regla { width: 60mm; height: 2.5pt; background: var(--azul); margin: 16mm 0 10mm; }
+  .portada .etq { font: bold 10.5pt Calibri, "Segoe UI", sans-serif; color: var(--azul); text-transform: uppercase; letter-spacing: .8pt; margin: 0 0 4pt; }
+  .portada ol { list-style: none; padding: 0; margin: 0; font: 13pt Calibri, "Segoe UI", sans-serif; }
+  .portada ol li { margin-bottom: 4pt; text-align: left; }
+  .portada .fecha { margin-top: auto; font: 12pt Calibri, "Segoe UI", sans-serif; color: var(--gris); }
+
+  /* ===== Tablas ===== */
+  table { width: 100%; border-collapse: collapse; margin: 3pt 0 7pt; font: 8pt/1.27 Calibri, "Segoe UI", sans-serif; }
+  tr { break-inside: avoid; }
+  thead { display: table-header-group; }
+  caption { caption-side: top; text-align: left; font: bold 8.6pt Calibri, "Segoe UI", sans-serif; color: var(--azul); padding: 0 0 3pt; break-after: avoid; }
+  th { background: var(--azul); color: #fff; text-align: left; padding: 2.5pt 4pt; font-weight: 600; vertical-align: bottom; }
+  td { padding: 1.9pt 4pt; border-bottom: .6pt solid var(--linea); vertical-align: top; overflow-wrap: anywhere; }
+  tbody tr:nth-child(even) td { background: #f7f9fc; }
+  td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }
+  tr.total td { font-weight: bold; border-top: 1.2pt solid var(--azul); background: #eaf0f8 !important; }
+  td:first-child { font-weight: 600; }
+  th code { background: transparent; color: #fff; padding: 0; }
+  td.nom { font: 6.9pt/1.25 Consolas, "Courier New", monospace; font-weight: 400; }
+  td.rech { background: #fdf0ee !important; }
+
+  /* ===== Código ===== */
+  .archivo { font: bold 7.4pt Consolas, "Courier New", monospace; background: #dfe6f0; color: var(--azul); padding: 1.5pt 6pt; margin: 5pt 0 0; border-radius: 3pt 3pt 0 0; break-after: avoid; }
+  pre { margin: 0 0 6pt; padding: 3pt 7pt; background: var(--fondo-cod); border: .6pt solid var(--linea); border-top: none; border-radius: 0 0 3pt 3pt; font: 7.2pt/1.24 Consolas, "Courier New", monospace; white-space: pre-wrap; break-inside: avoid; }
+  pre.partible { break-inside: auto; orphans: 4; widows: 4; }
+  pre.sola { border-top: .6pt solid var(--linea); border-radius: 3pt; margin-top: 4pt; }
+  .k { color: #7a3e9d; } .c { color: #6a737d; font-style: italic; }
+
+  /* ===== Fórmulas, notas, figuras ===== */
+  .formulas { margin: 3pt 0 7pt; padding: 5pt 10pt; background: #f1f5fb; border-left: 3pt solid var(--azul); font: 9.6pt/1.55 Cambria, Georgia, serif; break-inside: avoid; }
+  .formulas div { text-align: left; }
+  .nota { margin: 3pt 0 7pt; padding: 4pt 8pt; border-left: 3pt solid #c58b00; background: #fff8e6; font-size: 9pt; break-inside: avoid; }
+  figure { margin: 4pt 0 6pt; break-inside: avoid; }
+  figure svg { width: 100%; height: auto; display: block; }
+  figcaption { font: italic 8.4pt/1.3 Calibri, "Segoe UI", sans-serif; color: var(--gris); margin-top: 2pt; text-align: left; }
+
+  /* ===== Referencias (APA 7: sangría francesa) ===== */
+  .refs p { font-size: 9pt; line-height: 1.38; padding-left: 12.7mm; text-indent: -12.7mm; text-align: left; margin-bottom: 5pt; }
+
+  /* ===== SVG (la clase py/jv/js va en el propio <svg>) ===== */
+  svg text { font-family: Calibri, "Segoe UI", Arial, sans-serif; fill: #222; }
+  svg .caja { fill: #fff; stroke-width: 1.4; }
+  svg .tit { font-weight: bold; font-size: 12px; letter-spacing: .4px; }
+  svg .tx { font-size: 12px; }
+  svg .peq { font-size: 9px; fill: #555; }
+  svg .med { font-size: 10.5px; fill: #444; }
+  svg .flecha { stroke: #444; stroke-width: 1.4; fill: none; }
+  svg.py .caja { stroke: var(--py); } svg.py .tit { fill: var(--py); }
+  svg.jv .caja { stroke: var(--jv); } svg.jv .tit { fill: var(--jv); }
+  svg.js .caja { stroke: var(--js); } svg.js .tit { fill: #12795a; }
+  svg .rech { fill: #fdf0ee; stroke: #b3402a; stroke-width: 1.4; }
+  svg .ok { fill: #eaf6f0; stroke: #199e70; stroke-width: 1.4; }
+  svg .paso { fill: #f1f5fb; stroke: var(--azul); stroke-width: 1.4; }
+  svg .fuera { fill: #f6f6f6; stroke: #888; stroke-width: 1.2; stroke-dasharray: 4 3; }
+  svg .nota-svg { font-size: 10px; font-style: italic; fill: #555; }
+</style>
+</head>
+<body>
+
+<!-- Punta de flecha compartida por los diagramas -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+  <marker id="pt" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#444"/></marker>
+</defs></svg>
+
+<!-- =====================  1. PORTADA  ===================== -->
+<section class="portada">
+  <p class="inst">Universidad Autónoma del Estado de Hidalgo</p>
+  <p class="esc">Escuela Superior de Tlahuelilpan</p>
+  <p class="prog">Licenciatura en Ingeniería de Software · 3.er semestre</p>
+
+  <p class="titulo">Automatización y Gestión Concurrente de Pedidos en Tres Lenguajes de Programación</p>
+  <p class="sub">Python, Java y JavaScript/Node.js: análisis comparativo</p>
+
+  <div class="regla"></div>
+
+  <p class="etq">Integrantes del equipo</p>
+  <ol>
+    <li>Ian Hernández Ibarra</li>
+    <li>Leonardo Damián Hernández Hernández</li>
+    <li>Yurem Jesús Aco Luna</li>
+    <li>Edsson Einar Montijo Reyes</li>
+  </ol>
+
+  <p class="fecha">Noviembre de 2026</p>
+</section>
+
+<!-- =====================  2. INTRODUCCIÓN  ===================== -->
+<h2 class="nueva-pagina">2. Introducción</h2>
+
+<p>Una tienda en línea recibe pedidos todos los días y cada uno debe revisarse, cobrarse correctamente y avanzar por varias etapas (preparación, envío y entrega). Hecho a mano, ese trabajo es lento y propenso a errores: un descuento mal aplicado, un IVA mal redondeado o un pedido con cantidad cero que nadie detecta a tiempo. Nuestro proyecto automatiza ese proceso y lo usa, además, para estudiar algo más amplio: <strong>cómo cambia la misma solución cuando se escribe en lenguajes distintos</strong>.</p>
+
+<p>Por eso el sistema existe <strong>tres veces</strong>: en Python (interfaz Tkinter), en Java (interfaz Swing) y en JavaScript sobre Node.js (servidor Express con una página web como interfaz). Las tres leen los mismos archivos de la carpeta <code>datos/</code>, aplican las mismas reglas y, con los pedidos de prueba, producen exactamente el mismo total vendido: <strong>$8,360.46</strong>. Esa coincidencia es la base del estudio, porque permite comparar lenguajes y no soluciones distintas.</p>
+
+<h3>2.1 Objetivos</h3>
+<p><strong>Objetivo general.</strong> Comparar la implementación de un sistema de gestión de pedidos en Python, Java y JavaScript/Node.js, evaluando tipado, ejecución, manejo de errores, estructuras de datos y concurrencia, con evidencia tomada de nuestro código y de mediciones reales. <strong>Objetivos específicos:</strong> (1) implementar las mismas reglas de negocio con arquitectura Modelo-Vista-Controlador (MVC) en los tres lenguajes; (2) construir una interfaz gráfica con login, formulario, tabla de pedidos en tiempo real y un despachador concurrente; (3) verificar la corrección con 8 pruebas unitarias por lenguaje (24 en total) y con la consistencia del total de $8,360.46; (4) medir el tiempo secuencial frente al concurrente y contar las líneas de código (LOC) reales; y (5) presentar los resultados en un tablero web comparativo (Chart.js y Mermaid.js; Chart.js contributors, s. f.; Mermaid contributors, s. f.) y en este documento.</p>
+
+<h3>2.2 Alcance y forma de trabajo</h3>
+<p><strong>Incluye:</strong> versión de consola (genera <code>resultados_metricas.json</code>), interfaz gráfica con login contra <code>datos/usuarios.json</code>, formulario con vista previa de importes, tabla de pedidos, panel del despachador y el tablero servido en <code>/dashboard</code>. <strong>No incluye:</strong> base de datos (todo se lee de archivos JSON), contraseñas con <em>hash</em> (en <code>usuarios.json</code> están en texto plano a propósito, por ser un proyecto académico) ni cargas reales: el tiempo de cada etapa es <em>simulado</em> con una espera configurable y las mediciones se hicieron en una sola computadora (Windows 11, 32 procesadores lógicos). Cada integrante se hizo responsable de un área en los tres lenguajes, según los encabezados «Responsable» de los archivos: <strong>Ian</strong>, modelos, datos, login y base del tablero; <strong>Leonardo</strong>, reglas de negocio, dashboard de pedidos y gráficas; <strong>Yurem</strong>, consultas funcionales, pruebas, concurrencia en la interfaz y diagramas; <strong>Edsson</strong>, concurrencia base, formularios, tarjetas cualitativas y carga de métricas.</p>
+
+<!-- =====================  3. DESCRIPCIÓN DEL PROBLEMA  ===================== -->
+<h2>3. Descripción del problema</h2>
+
+<p><strong>Gestión manual.</strong> Los pedidos llegan como una lista de solicitudes (cliente, productos, tipo de envío) y una persona calcula los importes. El cálculo es repetitivo y sensible al redondeo: con descuentos, IVA y envío, un centavo de diferencia por pedido se acumula en el total. Los datos inválidos se descubren tarde (en nuestro archivo de prueba, <code>PED-005</code> pide una webcam con cantidad 0 y debe rechazarse antes de cobrarse o enviarse) y no hay un criterio explícito de orden: se atiende lo que se vea primero.</p>
+
+<p><strong>Cuello de botella de las prioridades.</strong> Si los pedidos se atienden en el orden en que se capturan, uno urgente (prioridad ALTA con envío express) puede esperar detrás de uno de prioridad BAJA. Además, cada cambio de estado (<em>pendiente</em> → <em>en proceso</em> → <em>enviado</em> → <em>entregado</em>) depende de personas o servicios externos y tarda. Los cuatro pedidos válidos del archivo de prueba suman 9 transiciones pendientes: una tras otra, con 100 ms de espera simulada cada una, la corrida tarda cerca de 0.9 s; si los pedidos avanzan al mismo tiempo, tarda lo que el pedido más largo (3 transiciones, unos 0.3 s). La brecha crece con el número de pedidos (apartado 14).</p>
+
+<p><strong>Necesidad de interfaz gráfica y de concurrencia.</strong> Una persona no técnica no debería editar archivos JSON ni leer una consola: necesita iniciar sesión, elegir productos de una lista, ver la vista previa de los importes y recibir los errores en pantalla (<code>messagebox</code>, <code>JOptionPane</code> o una alerta web). Y como cada transición tarda, procesar la cola en el mismo hilo de la ventana la dejaría congelada: hace falta un despachador que trabaje en segundo plano con N «trabajadores», atienda primero lo urgente y avise cada cambio de estado para que la tabla se actualice en vivo (apartado 13).</p>
+
+<!-- =====================  4. REGLAS DE NEGOCIO  ===================== -->
+<h2>4. Reglas de negocio</h2>
+
+<h3>4.1 Fórmulas de cálculo</h3>
+<p>Las reglas se implementaron igual en los tres lenguajes. Para un pedido con líneas de precio <i>p<sub>i</sub></i> y cantidad <i>q<sub>i</sub></i>:</p>
+
+<div class="formulas">
+  <div><strong>Subtotal:</strong> &nbsp; <i>S</i> = redondear( Σ <i>p<sub>i</sub></i> · <i>q<sub>i</sub></i> )</div>
+  <div><strong>Tasa de descuento:</strong> &nbsp; <i>d</i> = 10 % si <i>S</i> ≥ 2,000.00; &nbsp;si no, 5 % si el cliente es frecuente; &nbsp;si no, 0 %</div>
+  <div><strong>Descuento:</strong> &nbsp; <i>D</i> = redondear( <i>S</i> · <i>d</i> ) &nbsp;&nbsp;&nbsp; <strong>IVA:</strong> &nbsp; <i>I</i> = redondear( ( <i>S</i> − <i>D</i> ) · 0.16 )</div>
+  <div><strong>Envío:</strong> &nbsp; <i>E</i> = 50.00 (estándar) &nbsp;o&nbsp; 120.00 (express); no causa IVA</div>
+  <div><strong>Total:</strong> &nbsp; <i>T</i> = <i>S</i> − <i>D</i> + <i>I</i> + <i>E</i></div>
+</div>
+
+<p>La palabra clave es <strong>no encadenados</strong>: los descuentos del 10 % y del 5 % no se suman ni se aplican uno sobre otro. Gana el de monto y, solo si no aplica, se revisa el de cliente frecuente (con subtotal de $3,749.50, un cliente frecuente recibe 10 %, no 15 %; caso <code>PED-003</code>). El redondeo es a centavos con la regla comercial «la mitad sube» (0.005 pasa a 0.01).</p>
+
+<div class="archivo">Tasa de descuento · python/negocio.py · java/…/negocio/CalculadoraPedido.java · javascript/src/negocio.js</div>
+<pre class="partible"><span class="k">def</span> tasa_descuento(pedido: Pedido) -&gt; Decimal:
+    <span class="k">if</span> CalculadoraPedido.subtotal(pedido) &gt;= UMBRAL_DESCUENTO_MONTO:
+        <span class="k">return</span> DESCUENTO_POR_MONTO          <span class="c"># gana el de monto...</span>
+    <span class="k">if</span> pedido.cliente.es_frecuente:
+        <span class="k">return</span> DESCUENTO_FRECUENTE          <span class="c"># ...y solo si no aplica, el de frecuente</span>
+    <span class="k">return</span> Decimal("0")
+
+<span class="k">public static</span> BigDecimal tasaDescuento(Pedido pedido) {
+    <span class="k">if</span> (subtotal(pedido).compareTo(UMBRAL_DESCUENTO_MONTO) &gt;= 0) {
+        <span class="k">return</span> DESCUENTO_POR_MONTO;
+    }
+    <span class="k">if</span> (pedido.getCliente().esFrecuente()) {
+        <span class="k">return</span> DESCUENTO_FRECUENTE;
+    }
+    <span class="k">return</span> BigDecimal.ZERO;
+}
+
+<span class="k">static</span> porcentajeDescuento(pedido) {
+  <span class="k">if</span> (CalculadoraPedido.subtotal(pedido) &gt;= UMBRAL_DESCUENTO_MONTO_CENTAVOS) {
+    <span class="k">return</span> DESCUENTO_POR_MONTO_PORCENTAJE;
+  }
+  <span class="k">if</span> (pedido.cliente.esFrecuente) {
+    <span class="k">return</span> DESCUENTO_FRECUENTE_PORCENTAJE;
+  }
+  <span class="k">return</span> 0;
+}</pre>
+
+<table>
+  <caption>Tabla 1. El resto del cálculo, lado a lado (extractos simplificados)</caption>
+  <thead><tr><th style="width:11%">Paso</th><th style="width:29%">Python (<code>Decimal</code>)</th><th style="width:32%">Java (<code>BigDecimal</code>)</th><th>JavaScript (centavos enteros)</th></tr></thead>
+  <tbody>
+    <tr><td>Redondeo</td><td><code>monto.quantize(_CENTAVO, rounding=ROUND_HALF_UP)</code></td><td><code>monto.setScale(2, RoundingMode.HALF_UP)</code></td><td><code>Math.round((centavos * tasa) / 100)</code></td></tr>
+    <tr><td>IVA 16 %</td><td><code>redondear(base * TASA_IVA)</code></td><td><code>redondear(base.multiply(TASA_IVA))</code></td><td><code>porcentaje(base, IVA_PORCENTAJE)</code></td></tr>
+    <tr><td>Envío</td><td><code>COSTO_ENVIO[pedido.envio]</code></td><td><code>pedido.getEnvio() == TipoEnvio.EXPRESS ? ENVIO_EXPRESS : ENVIO_ESTANDAR</code></td><td><code>COSTO_ENVIO_CENTAVOS[pedido.envio]</code></td></tr>
+    <tr><td>Total</td><td><code>subtotal - descuento + iva + envio</code></td><td><code>subtotal.subtract(descuento).add(iva).add(envio)</code></td><td><code>subtotal - descuento + iva + envio</code></td></tr>
+  </tbody>
+</table>
+
+<h3>4.2 Corrida paso a paso de <code>datos/solicitudes_pequenas.json</code></h3>
+<p>La Tabla 2 repite el cálculo de cada pedido con los datos del archivo. Es el mismo resultado que reportan los tres <code>resultados_metricas.json</code>: 4 pedidos registrados, 1 rechazado y un total vendido de <strong>$8,360.46</strong>. <code>PED-002</code> muestra el redondeo hacia arriba (5 % de 885.30 = 44.265, que pasa a 44.27) y <code>PED-003</code> el descuento no encadenado.</p>
+
+<table>
+  <caption>Tabla 2. Cálculo de cada pedido (importes en pesos)</caption>
+  <thead><tr><th style="width:9%">Pedido</th><th style="width:19%">Líneas (precio × cant.)</th><th class="num" style="width:9%">Subtotal <i>S</i></th><th style="width:15%">Regla de descuento</th><th class="num" style="width:9%">Desc. <i>D</i></th><th style="width:16%">IVA <i>I</i> = (<i>S</i>−<i>D</i>) × 0.16</th><th class="num" style="width:7%">Envío</th><th class="num">Total <i>T</i></th></tr></thead>
+  <tbody>
+    <tr><td>PED-001</td><td>899.50 × 2 + 349.90 × 1</td><td class="num">2,148.90</td><td><i>S</i> ≥ 2,000 → 10 %</td><td class="num">214.89</td><td>1,934.01 × 0.16 = 309.4416 → 309.44</td><td class="num">50.00</td><td class="num">2,293.45</td></tr>
+    <tr><td>PED-002</td><td>615.33 × 1 + 89.99 × 3</td><td class="num">885.30</td><td>frecuente, <i>S</i> &lt; 2,000 → 5 %</td><td class="num">44.27</td><td>841.03 × 0.16 = 134.5648 → 134.56</td><td class="num">120.00</td><td class="num">1,095.59</td></tr>
+    <tr><td>PED-003</td><td>3,299.00 × 1 + 450.50 × 1</td><td class="num">3,749.50</td><td>frecuente, <i>S</i> ≥ 2,000 → solo 10 %</td><td class="num">374.95</td><td>3,374.55 × 0.16 = 539.928 → 539.93</td><td class="num">120.00</td><td class="num">4,034.48</td></tr>
+    <tr><td>PED-004</td><td>129.90 × 4 + 245.00 × 1</td><td class="num">764.60</td><td>regular, <i>S</i> &lt; 2,000 → 0 %</td><td class="num">0.00</td><td>764.60 × 0.16 = 122.336 → 122.34</td><td class="num">50.00</td><td class="num">936.94</td></tr>
+    <tr><td class="rech">PED-005</td><td class="rech">799.00 × 0</td><td class="rech" colspan="6"><strong>Rechazado.</strong> <code>ValidadorPedido</code> detecta <code>cantidad &lt;= 0</code> y lanza <code>PedidoInvalidoError</code>: «El pedido PED-005 tiene una cantidad inválida (0) en el producto WEB-909: debe ser un entero mayor que 0.» <code>AlmacenPedidos.cargar()</code> guarda el motivo y el pedido no llega al cálculo ni suma al total.</td></tr>
+    <tr class="total"><td colspan="2">Totales (4 pedidos)</td><td class="num">7,548.30</td><td>7,548.30 − 634.11 + 1,106.27 + 340.00</td><td class="num">634.11</td><td>Σ <i>I</i> = 1,106.27</td><td class="num">340.00</td><td class="num">8,360.46</td></tr>
+  </tbody>
+</table>
+
+<h3>4.3 Validaciones de entrada</h3>
+<p>Cada validación vive donde corresponde: el <em>negocio</em> rechaza lo que viola una regla, el <em>controlador</em> lo que no tiene el formato esperado y la <em>vista</em> solo muestra el mensaje; así no repetimos «cantidad &gt; 0» en la interfaz.</p>
+<table>
+  <caption>Tabla 3. Validaciones y mensajes que ve el usuario</caption>
+  <thead><tr><th style="width:13%">Dónde</th><th style="width:47%">Regla</th><th>Mensaje</th></tr></thead>
+  <tbody>
+    <tr><td>Negocio</td><td>Al menos un producto; cada cantidad es un entero &gt; 0.</td><td>«El pedido PED-005 tiene una cantidad inválida (0)…»</td></tr>
+    <tr><td>Formulario</td><td>Producto de la lista; cantidad entera; id y nombre del cliente obligatorios; carrito no vacío.</td><td>«La cantidad «abc» no es un número entero…»</td></tr>
+    <tr><td>Login</td><td>Usuario y contraseña obligatorios y coincidentes con <code>usuarios.json</code>.</td><td>«Escribe tu usuario y tu contraseña.» / «Usuario o contraseña incorrectos.»</td></tr>
+    <tr><td>Despachador</td><td>Retardo entero de 50 a 5000 ms; de 1 a 8 trabajadores; una corrida a la vez; cola no vacía.</td><td>«La cantidad de trabajadores debe estar entre 1 y 8.»</td></tr>
+  </tbody>
+</table>
+
+<h3>4.4 Reglas de prioridad y de tiempos</h3>
+<table>
+  <caption>Tabla 4. Las cinco reglas de prioridad y tiempos del despachador</caption>
+  <thead><tr><th style="width:5%">Id</th><th style="width:22%">Regla</th><th>Descripción</th></tr></thead>
+  <tbody>
+    <tr><td>R1</td><td>Tres niveles</td><td>ALTA (1) se atiende antes que MEDIA (2) y esta antes que BAJA (3): el número menor va primero.</td></tr>
+    <tr><td>R2</td><td>Desempate por antigüedad</td><td>A igual prioridad se atiende primero el pedido con fecha más antigua.</td></tr>
+    <tr><td>R3</td><td>Entrada a la cola</td><td>Solo entran pedidos con estados por recorrer; los ENTREGADO y CANCELADO quedan fuera.</td></tr>
+    <tr><td>R4</td><td>Flujo y tiempo por etapa</td><td>PENDIENTE → EN_PROCESO → ENVIADO → ENTREGADO. Cada transición tarda un retardo simulado (100 ms en las mediciones; de 50 a 5000 ms en las interfaces) y un pedido a medio camino solo hace las que le faltan.</td></tr>
+    <tr><td>R5</td><td>Límite de simultaneidad</td><td>De 1 a 8 trabajadores (2 por defecto); cada uno toma el siguiente pedido de mayor prioridad. Con 1 trabajador la corrida equivale a la secuencial: tarda transiciones × retardo.</td></tr>
+  </tbody>
+</table>
+<p>Con los datos de prueba, <code>PED-002</code> y <code>PED-003</code> son ALTA y <code>PED-002</code> va primero porque su fecha (1 de noviembre) es anterior a la de <code>PED-003</code> (5 de noviembre); después van <code>PED-001</code> (MEDIA) y <code>PED-004</code> (BAJA). Es el orden de <code>orden_por_prioridad</code> en los tres archivos de resultados.</p>
+<p class="nota"><strong>Aclaración.</strong> El sistema no modela plazos de entrega comprometidos con el cliente (por ejemplo, «un pedido ALTA se entrega en 24 horas»). Los «tiempos máximos» de esta tabla son límites de la simulación (R4 y R5), no acuerdos de servicio.</p>
+
+<!-- =====================  5. JUSTIFICACIÓN DE LOS LENGUAJES  ===================== -->
+<h2>5. Justificación de los lenguajes seleccionados</h2>
+
+<p>Elegimos Python, Java y JavaScript con Node.js porque los tres resuelven el mismo problema <strong>con herramientas muy distintas</strong>, y esa diferencia es lo que queríamos observar. Nos dieron cuatro contrastes que se repiten a lo largo del documento:</p>
+
+<table>
+  <caption>Tabla 5. Los contrastes que motivaron la elección</caption>
+  <thead><tr><th style="width:15%">Eje</th><th style="width:27%">Python</th><th style="width:29%">Java</th><th>JavaScript (Node.js)</th></tr></thead>
+  <tbody>
+    <tr><td>Tipado</td><td>Dinámico y fuerte</td><td>Estático y fuerte</td><td>Dinámico y débil</td></tr>
+    <tr><td>Ejecución</td><td>Intérprete de bytecode (CPython)</td><td>Bytecode y JVM con JIT</td><td>Motor V8 con JIT y bucle de eventos</td></tr>
+    <tr><td>Concurrencia</td><td>Corrutinas (<code>asyncio</code>) en un hilo de apoyo</td><td>Hilos reales (<code>ExecutorService</code>)</td><td>Un solo hilo: promesas y <code>async/await</code></td></tr>
+    <tr><td>Dinero</td><td><code>Decimal</code></td><td><code>BigDecimal</code></td><td>Enteros en centavos</td></tr>
+  </tbody>
+</table>
+
+<p><strong>Python</strong> representa la sintaxis breve y el tipado dinámico: se escribe menos y se ve el resultado rápido, pero varios errores quedan para el momento de ejecutar (Ramalho, 2022). <strong>Java</strong> es el extremo contrario: más texto y estructura a cambio de que el compilador detecte muchos errores antes de correr. <strong>JavaScript</strong> es el lenguaje de la web y, con Node.js, del servidor; su modelo de un solo hilo con bucle de eventos obliga a pensar la concurrencia de otra manera y nos llevó a una arquitectura distinta: cliente-servidor en lugar de una ventana de escritorio. Y cada uno resuelve distinto <strong>representar dinero</strong>, porque el punto flotante no es exacto (apartado 9).</p>
+
+<!-- =====================  6. CLASIFICACIÓN  ===================== -->
+<h2>6. Clasificación de cada lenguaje</h2>
+
+<table>
+  <caption>Tabla 6. Clasificación (versiones registradas en <code>resultados_metricas.json</code>)</caption>
+  <thead><tr><th style="width:14%">Criterio</th><th style="width:28%">Python 3.14</th><th style="width:29%">Java 25 (release 17)</th><th>JavaScript (Node.js 24)</th></tr></thead>
+  <tbody>
+    <tr><td>Nivel de abstracción</td><td>Alto; sintaxis compacta y memoria administrada</td><td>Alto; más ceremonia (tipos, clases, paquetes); recolector de basura</td><td>Alto; funciones como valores; recolector de basura de V8</td></tr>
+    <tr><td>Forma de ejecución</td><td>CPython compila a <em>bytecode</em> y lo ejecuta una máquina virtual de pila (la compilación estándar no usa JIT)</td><td><code>javac</code> genera <em>bytecode</em> (<code>.class</code>); la JVM lo interpreta y compila a código máquina lo «caliente» (JIT)</td><td>V8 genera <em>bytecode</em> (Ignition) y optimiza lo que se repite (TurboFan); el bucle de eventos coordina lo asíncrono</td></tr>
+    <tr><td>Sistema de tipos</td><td>Dinámico y fuerte; las <em>type hints</em> documentan, no se verifican al ejecutar</td><td>Estático y fuerte; el compilador verifica los tipos; genéricos</td><td>Dinámico y débil; convierte tipos de forma implícita (coerción)</td></tr>
+    <tr><td>Propósito</td><td>General: automatización, datos, enseñanza, <em>scripting</em></td><td>General: sistemas empresariales, Android, aplicaciones grandes y duraderas</td><td>Lenguaje del navegador; con Node.js, también servidores y herramientas</td></tr>
+    <tr><td>Paradigmas</td><td>Multiparadigma: objetos, imperativo y funcional parcial</td><td>Orientado a objetos; funcional desde Java 8 (lambdas y <em>streams</em>)</td><td>Objetos con prototipos (sintaxis <code>class</code>), funcional y orientado a eventos</td></tr>
+  </tbody>
+</table>
+
+<p><strong>Python.</strong> Aprovechamos su brevedad: la capa de negocio cabe en 76 líneas de código (Tabla 18), aunque las <em>type hints</em> no son una garantía y por eso <code>ValidadorPedido</code> comprueba <code>isinstance(cantidad, int)</code> con el programa corriendo. <strong>Java.</strong> Es la versión con más estructura (52 archivos frente a 27 de Python): cada tipo tiene su clase y el compilador no deja pasar un <code>String</code> donde se pide un <code>BigDecimal</code>; el costo es la verbosidad. <strong>JavaScript.</strong> Nos obligó a decidir lo que en los otros dos viene resuelto: no hay decimal exacto (usamos centavos) ni ventanas de escritorio (usamos el navegador).</p>
+
+<!-- =====================  7. PARADIGMAS  ===================== -->
+<h2>7. Descripción de los paradigmas utilizados</h2>
+
+<p>No usamos un solo paradigma por lenguaje: el mismo programa mezcla cuatro, cada uno donde resulta más natural.</p>
+
+<table>
+  <caption>Tabla 7. Paradigmas y dónde aparecen</caption>
+  <thead><tr><th style="width:17%">Paradigma</th><th style="width:27%">Python</th><th style="width:28%">Java</th><th>JavaScript</th></tr></thead>
+  <tbody>
+    <tr><td>Orientado a objetos</td><td><code>modelos.py</code>, <code>negocio.py</code>, <code>Despachador</code></td><td>paquetes <code>modelo</code>, <code>negocio</code>, <code>concurrencia</code></td><td><code>modelos.js</code>, <code>negocio.js</code>, <code>despachador.js</code></td></tr>
+    <tr><td>Imperativo / estructurado</td><td><code>ValidadorPedido</code>, lectores de JSON</td><td><code>ValidadorPedido</code>, <code>LectorJson</code></td><td><code>ValidadorPedido</code>, <code>lectorJson.js</code></td></tr>
+    <tr><td>Funcional</td><td><code>funcional.py</code>: <code>filter</code>, <code>sorted</code>, <code>reduce</code>, <code>lambda</code></td><td><code>ConsultasPedidos</code>: <em>streams</em> y lambdas</td><td><code>funcional.js</code>: <code>filter</code>, <code>map</code>, <code>reduce</code>, flechas</td></tr>
+    <tr><td>Dirigido por eventos</td><td>Tkinter: <code>mainloop</code>, <code>after()</code>, <code>bind</code></td><td>Swing: oyentes y el hilo de eventos</td><td>Bucle de eventos de Node; <code>addEventListener</code> y <code>setInterval</code></td></tr>
+  </tbody>
+</table>
+
+<h3>7.1 Orientación a objetos: la estructura del <code>Pedido</code></h3>
+<p>Modelamos el dominio con clases que solo guardan datos (<code>Producto</code>, <code>Cliente</code>, <code>Pedido</code>) y dejamos los cálculos en otras (<code>CalculadoraPedido</code>, <code>ValidadorPedido</code>), de modo que cada clase tiene una sola responsabilidad. El mismo <code>Pedido</code> en los tres lenguajes:</p>
+<div class="archivo">python/modelos.py · java/…/modelo/Pedido.java (extracto) · javascript/src/modelos.js (extracto)</div>
+<pre class="partible"><span class="k">@dataclass</span>
+<span class="k">class</span> Pedido:
+    id: str
+    cliente: Cliente
+    fecha: datetime
+    productos: list[Producto] = field(default_factory=list)
+    envio: TipoEnvio = TipoEnvio.ESTANDAR
+    prioridad: Prioridad = Prioridad.MEDIA
+    estado: EstadoPedido = EstadoPedido.PENDIENTE
+
+    <span class="k">def</span> cambiar_estado(self, nuevo: EstadoPedido) -&gt; None:
+        self.estado = nuevo
+
+<span class="k">public class</span> Pedido {
+    <span class="k">private final</span> List&lt;Producto&gt; productos;       <span class="c">// ...junto con id, cliente, fecha, envio y prioridad (todos final)</span>
+    <span class="c">// volatile: el estado lo cambian hilos de trabajo y lo lee el hilo principal.</span>
+    <span class="k">private volatile</span> EstadoPedido estado;
+    <span class="k">public</span> Pedido(String id, Cliente cliente, LocalDateTime fecha, List&lt;Producto&gt; productos, ...) {
+        <span class="k">this</span>.productos = List.copyOf(productos);   <span class="c">// copia inmutable</span>
+        ...
+    }
+    <span class="k">public void</span> cambiarEstado(EstadoPedido nuevo) { <span class="k">this</span>.estado = nuevo; }
+}
+
+<span class="k">class</span> Pedido {
+  <span class="k">constructor</span>({ id, cliente, fecha, productos = [], envio = TipoEnvio.ESTANDAR,
+    prioridad = Prioridad.MEDIA, estado = EstadoPedido.PENDIENTE }) {
+    <span class="k">this</span>.productos = Object.freeze([...productos]);   <span class="c">// arreglo inmutable</span>
+    ...
+  }
+  cambiarEstado(nuevo) { <span class="k">this</span>.estado = nuevo; }
+}</pre>
+<p>Aparece la misma idea de <strong>encapsulamiento e inmutabilidad</strong> (<code>frozen=True</code>, <code>final</code> y <code>List.copyOf</code>, <code>Object.freeze</code>). El campo <code>estado</code> es la excepción, porque cambia mientras el despachador trabaja; en Java es <code>volatile</code> para que el cambio hecho por un hilo sea visible para los demás (Goetz et al., 2006).</p>
+
+<h3>7.2 Programación imperativa, funcional y dirigida por eventos</h3>
+<p><strong>Imperativa y estructurada:</strong> las validaciones y la lectura de archivos usan secuencia, selección e iteración con salidas anticipadas mediante excepciones (se ven en los apartados 10 y 11). <strong>Funcional:</strong> las consultas sobre listas de pedidos son funciones puras que no modifican la lista recibida y devuelven una nueva, con funciones de orden superior y funciones anónimas. La misma consulta, «ordenar por prioridad y luego por antigüedad»:</p>
+<div class="archivo">python/funcional.py · java/…/funcional/ConsultasPedidos.java · javascript/src/funcional.js</div>
+<pre class="partible"><span class="k">def</span> ordenar_por_prioridad(pedidos: Iterable[Pedido]) -&gt; list[Pedido]:
+    <span class="k">return</span> sorted(pedidos, key=<span class="k">lambda</span> p: (p.prioridad.value, p.fecha))
+
+<span class="k">public static</span> List&lt;Pedido&gt; ordenarPorPrioridad(List&lt;Pedido&gt; pedidos) {
+    <span class="k">return</span> pedidos.stream()
+            .sorted(Comparator.comparing(Pedido::getPrioridad).thenComparing(Pedido::getFecha))
+            .toList();
+}
+
+<span class="k">const</span> ordenarPorPrioridad = (pedidos) =&gt;
+  [...pedidos].sort(
+    (a, b) =&gt; NIVEL_PRIORIDAD[a.prioridad] - NIVEL_PRIORIDAD[b.prioridad] || a.fecha - b.fecha
+  );</pre>
+<p>Python usa una <em>tupla</em> como clave de orden; Java encadena comparadores; JavaScript usa la tabla <code>NIVEL_PRIORIDAD</code> y el operador <code>||</code> para desempatar. Los tres copian la lista para no alterar la original. <strong>Dirigida por eventos:</strong> una interfaz espera a que ocurra algo (un clic, el aviso de que un pedido cambió de estado) y reacciona. El despachador funciona igual: en lugar de llamar a la pantalla, <strong>emite eventos</strong> tipificados (<code>CORRIDA_INICIADA</code>, <code>PEDIDO_INICIADO</code>, <code>TRANSICION</code>, <code>PEDIDO_TERMINADO</code>, <code>CORRIDA_TERMINADA</code>, <code>CORRIDA_DETENIDA</code> y <code>ERROR</code>) y cada interfaz los recoge a su manera (apartado 13).</p>
+
+<!-- =====================  8. ARQUITECTURA  ===================== -->
+<h2>8. Arquitectura de cada solución</h2>
+
+<h3>8.1 Separación en capas Modelo-Vista-Controlador</h3>
+<p>Los tres lenguajes comparten el patrón MVC (Gamma et al., 1994; Fowler, 2002): la <strong>vista</strong> solo dibuja y muestra mensajes; el <strong>controlador</strong> recibe lo que capturó la vista, valida el formato y llama al modelo; y el <strong>modelo</strong> contiene los datos y las reglas sin saber nada de la interfaz. Así, <code>CalculadoraPedido</code> es la misma pieza para la consola, la ventana y el servidor web.</p>
+
+<table>
+  <caption>Tabla 8. Dónde vive cada capa</caption>
+  <thead><tr><th style="width:12%">Capa</th><th style="width:29%">Python (Tkinter)</th><th style="width:29%">Java (Swing)</th><th>JavaScript (Express)</th></tr></thead>
+  <tbody>
+    <tr><td>Vista</td><td><code>gui/vista_*.py</code> (<code>ttk.Frame</code>) y <code>estilos.py</code></td><td>paquete <code>vista</code>: <code>VentanaLogin</code>, <code>VistaDashboard</code>, <code>PanelFormulario</code>, <code>PanelConcurrencia</code></td><td>navegador: <code>public/*.html</code> y <code>public/js/*.js</code></td></tr>
+    <tr><td>Controlador</td><td><code>gui/controlador_*.py</code></td><td>paquete <code>controlador</code></td><td><code>src/controladores/*.js</code> y rutas HTTP en <code>src/api/</code></td></tr>
+    <tr><td>Modelo</td><td><code>modelos</code>, <code>negocio</code>, <code>almacen</code>, <code>autenticacion</code>, <code>despachador</code></td><td>paquetes <code>modelo</code>, <code>negocio</code>, <code>datos</code>, <code>seguridad</code>, <code>concurrencia</code></td><td><code>modelos.js</code>, <code>negocio.js</code>, <code>almacen.js</code>, <code>autenticacion.js</code>, <code>despachador.js</code></td></tr>
+  </tbody>
+</table>
+
+<h3>8.2 Diagramas de arquitectura y del ciclo de vida del pedido</h3>
+
+<figure>
+  <svg class="py" viewBox="0 0 770 168" role="img" aria-label="Arquitectura MVC de la versión en Python con Tkinter">
+    <text class="tit" x="83" y="13" text-anchor="middle">VISTA (Tkinter)</text>
+    <text class="tit" x="284" y="13" text-anchor="middle">CONTROLADOR</text>
+    <text class="tit" x="485" y="13" text-anchor="middle">MODELO</text>
+    <text class="tit" x="686" y="13" text-anchor="middle">DATOS (JSON)</text>
+    <rect class="caja" x="0" y="20" width="167" height="144" rx="5"/>
+    <rect class="caja" x="201" y="20" width="167" height="144" rx="5"/>
+    <rect class="caja" x="402" y="20" width="167" height="144" rx="5"/>
+    <rect class="caja" x="603" y="20" width="167" height="144" rx="5"/>
+    <g class="tx"><text x="10" y="42">VistaLogin</text><text x="10" y="60">VistaDashboard</text><text x="10" y="78">VistaFormulario</text><text x="10" y="96">VistaConcurrencia</text><text x="10" y="126">messagebox → errores</text><text x="10" y="144">after() cada 50 ms</text></g>
+    <g class="tx"><text x="211" y="42">ControladorLogin</text><text x="211" y="60">ControladorFormulario</text><text x="211" y="78">ControladorDashboard</text><text x="211" y="96">ControladorConcurrencia</text><text x="211" y="126">valida el formato y</text><text x="211" y="144">traduce los errores</text></g>
+    <g class="tx"><text x="412" y="42">Pedido, Cliente, Producto</text><text x="412" y="60">CalculadoraPedido</text><text x="412" y="78">ValidadorPedido</text><text x="412" y="96">AlmacenPedidos</text><text x="412" y="114">ServicioAutenticacion</text><text x="412" y="132">Despachador (hilo)</text></g>
+    <g class="tx"><text x="613" y="42">usuarios.json</text><text x="613" y="60">solicitudes_pequenas.json</text><text x="613" y="78">catalogo.json</text><text x="613" y="96">resultados_metricas.json</text></g>
+    <path class="flecha" d="M167,92 H201" marker-end="url(#pt)" marker-start="url(#pt)"/>
+    <path class="flecha" d="M368,92 H402" marker-end="url(#pt)" marker-start="url(#pt)"/>
+    <path class="flecha" d="M569,92 H603" marker-end="url(#pt)" marker-start="url(#pt)"/>
+    <text class="peq" x="184" y="106" text-anchor="middle">eventos</text>
+    <text class="peq" x="385" y="106" text-anchor="middle">llama</text>
+    <text class="peq" x="586" y="106" text-anchor="middle">lee</text>
+  </svg>
+  <figcaption>Figura 1. Versión Python: <code>AplicacionGUI</code> crea el modelo y los controladores y entrega cada controlador a su vista.</figcaption>
+</figure>
+
+<figure>
+  <svg class="jv" viewBox="0 0 770 168" role="img" aria-label="Arquitectura MVC de la versión en Java con Swing">
+    <text class="tit" x="83" y="13" text-anchor="middle">VISTA (Swing)</text>
+    <text class="tit" x="284" y="13" text-anchor="middle">CONTROLADOR</text>
+    <text class="tit" x="485" y="13" text-anchor="middle">MODELO</text>
+    <text class="tit" x="686" y="13" text-anchor="middle">DATOS (JSON · Gson)</text>
+    <rect class="caja" x="0" y="20" width="167" height="144" rx="5"/>
+    <rect class="caja" x="201" y="20" width="167" height="144" rx="5"/>
+    <rect class="caja" x="402" y="20" width="167" height="144" rx="5"/>
+    <rect class="caja" x="603" y="20" width="167" height="144" rx="5"/>
+    <g class="tx"><text x="10" y="42">VentanaLogin</text><text x="10" y="60">VistaDashboard</text><text x="10" y="78">PanelFormulario</text><text x="10" y="96">PanelConcurrencia</text><text x="10" y="126">JOptionPane → errores</text><text x="10" y="144">invokeLater (hilo Swing)</text></g>
+    <g class="tx"><text x="211" y="42">ControladorLogin</text><text x="211" y="60">ControladorFormulario</text><text x="211" y="78">ControladorDashboard</text><text x="211" y="96">ControladorConcurrencia</text><text x="211" y="126">valida el formato y</text><text x="211" y="144">lanza *Exception</text></g>
+    <g class="tx"><text x="412" y="42">Pedido, Cliente, Producto</text><text x="412" y="60">CalculadoraPedido</text><text x="412" y="78">ValidadorPedido</text><text x="412" y="96">AlmacenPedidos</text><text x="412" y="114">ServicioAutenticacion</text><text x="412" y="132">Despachador (hilos)</text></g>
+    <g class="tx"><text x="613" y="42">usuarios.json</text><text x="613" y="60">solicitudes_pequenas.json</text><text x="613" y="78">catalogo.json</text><text x="613" y="96">resultados_metricas.json</text></g>
+    <path class="flecha" d="M167,92 H201" marker-end="url(#pt)" marker-start="url(#pt)"/>
+    <path class="flecha" d="M368,92 H402" marker-end="url(#pt)" marker-start="url(#pt)"/>
+    <path class="flecha" d="M569,92 H603" marker-end="url(#pt)" marker-start="url(#pt)"/>
+    <text class="peq" x="184" y="106" text-anchor="middle">eventos</text>
+    <text class="peq" x="385" y="106" text-anchor="middle">llama</text>
+    <text class="peq" x="586" y="106" text-anchor="middle">lee</text>
+  </svg>
+  <figcaption>Figura 2. Versión Java: <code>AplicacionGui</code> arma <code>VistaDashboard</code> con sus tres controladores; los hilos del despachador avisan a la vista con <code>invokeLater</code>.</figcaption>
+</figure>
+
+<figure>
+  <svg class="js" viewBox="0 0 770 172" role="img" aria-label="Arquitectura cliente-servidor de la versión en JavaScript con Express">
+    <text class="tit" x="69" y="13" text-anchor="middle">NAVEGADOR (vista)</text>
+    <text class="tit" x="227" y="13" text-anchor="middle">API EXPRESS</text>
+    <text class="tit" x="385" y="13" text-anchor="middle">CONTROLADORES</text>
+    <text class="tit" x="543" y="13" text-anchor="middle">MODELO</text>
+    <text class="tit" x="701" y="13" text-anchor="middle">DATOS (JSON)</text>
+    <rect class="caja" x="0" y="20" width="138" height="148" rx="5"/>
+    <rect class="caja" x="158" y="20" width="138" height="148" rx="5"/>
+    <rect class="caja" x="316" y="20" width="138" height="148" rx="5"/>
+    <rect class="caja" x="474" y="20" width="138" height="148" rx="5"/>
+    <rect class="caja" x="632" y="20" width="138" height="148" rx="5"/>
+    <g class="tx"><text x="9" y="42">login.html</text><text x="9" y="60">dashboard.html</text><text x="9" y="78">login.js</text><text x="9" y="96">formulario.js</text><text x="9" y="114">pedidos.js</text><text x="9" y="132">concurrencia.js</text><text x="9" y="154">toast() = alertas</text></g>
+    <g class="tx"><text x="167" y="42">rutasAcceso</text><text x="167" y="60">rutasPedidos</text><text x="167" y="78">rutasFormulario</text><text x="167" y="96">rutasDespachador</text><text x="167" y="124">sesiones (cookie)</text><text x="167" y="142">errores → 400/401/422</text></g>
+    <g class="tx"><text x="325" y="42">Login</text><text x="325" y="60">Formulario</text><text x="325" y="78">Dashboard</text><text x="325" y="96">Concurrencia</text><text class="nota-svg" x="325" y="126">(cada una es una clase</text><text class="nota-svg" x="325" y="140">Controlador + nombre)</text></g>
+    <g class="tx"><text x="483" y="42">modelos.js</text><text x="483" y="60">negocio.js</text><text x="483" y="78">almacen.js</text><text x="483" y="96">autenticacion.js</text><text x="483" y="114">despachador.js</text></g>
+    <g class="tx"><text x="641" y="42">usuarios</text><text x="641" y="60">solicitudes_pequenas</text><text x="641" y="78">catalogo</text><text x="641" y="96">resultados_metricas</text></g>
+    <path class="flecha" d="M138,94 H158" marker-end="url(#pt)" marker-start="url(#pt)"/>
+    <path class="flecha" d="M296,94 H316" marker-end="url(#pt)" marker-start="url(#pt)"/>
+    <path class="flecha" d="M454,94 H474" marker-end="url(#pt)" marker-start="url(#pt)"/>
+    <path class="flecha" d="M612,94 H632" marker-end="url(#pt)" marker-start="url(#pt)"/>
+  </svg>
+  <figcaption>Figura 3. Versión JavaScript (cliente-servidor): el navegador consulta la API con <code>fetch()</code> y JSON; Express traduce HTTP a llamadas a los controladores, que reutilizan los módulos de negocio de la fase 1.</figcaption>
+</figure>
+
+<figure>
+  <svg viewBox="0 0 770 150" role="img" aria-label="Flujo de un pedido desde el archivo JSON hasta el estado entregado">
+    <rect class="paso" x="0" y="8" width="94" height="58" rx="5"/>
+    <rect class="paso" x="112.7" y="8" width="94" height="58" rx="5"/>
+    <rect class="paso" x="225.3" y="8" width="94" height="58" rx="5"/>
+    <rect class="paso" x="338" y="8" width="94" height="58" rx="5"/>
+    <rect class="paso" x="450.7" y="8" width="94" height="58" rx="5"/>
+    <rect class="paso" x="563.3" y="8" width="94" height="58" rx="5"/>
+    <rect class="ok"   x="676" y="8" width="94" height="58" rx="5"/>
+    <rect class="rech" x="112.7" y="96" width="94" height="52" rx="5"/>
+    <g class="tx" text-anchor="middle">
+      <text x="47" y="30" font-weight="bold">1 · Leer</text><text x="47" y="46">archivo JSON</text>
+      <text x="159.7" y="26" font-weight="bold">2 · Validar</text><text x="159.7" y="40">¿productos y</text><text x="159.7" y="54">cantidad &gt; 0?</text>
+      <text x="272.3" y="26" font-weight="bold">3 · Calcular</text><text x="272.3" y="40">descuento, IVA</text><text x="272.3" y="54">y envío</text>
+      <text x="385" y="30" font-weight="bold">4 · Registrar</text><text x="385" y="46">en el almacén</text>
+      <text x="497.7" y="26" font-weight="bold">5 · Ordenar</text><text x="497.7" y="40">por prioridad</text><text x="497.7" y="54">y antigüedad</text>
+      <text x="610.3" y="26" font-weight="bold">6 · Procesar</text><text x="610.3" y="40">con N</text><text x="610.3" y="54">trabajadores</text>
+      <text x="723" y="30" font-weight="bold">7 · ENTREGADO</text><text x="723" y="46">y métricas</text>
+      <text x="159.7" y="116" font-weight="bold">Rechazo:</text><text x="159.7" y="130">se avisa al</text><text x="159.7" y="144">usuario</text>
+    </g>
+    <path class="flecha" d="M94,37 H112" marker-end="url(#pt)"/>
+    <path class="flecha" d="M206.7,37 H225" marker-end="url(#pt)"/>
+    <path class="flecha" d="M319.3,37 H338" marker-end="url(#pt)"/>
+    <path class="flecha" d="M432,37 H450" marker-end="url(#pt)"/>
+    <path class="flecha" d="M544.7,37 H563" marker-end="url(#pt)"/>
+    <path class="flecha" d="M657.3,37 H676" marker-end="url(#pt)"/>
+    <path class="flecha" d="M159.7,66 V96" marker-end="url(#pt)"/>
+    <text class="peq" x="166" y="84">no</text>
+    <text class="peq" x="216" y="31" text-anchor="middle">sí</text>
+  </svg>
+  <figcaption>Figura 4. Flujo de un pedido: lo inválido se corta en el paso 2 y nunca llega al cálculo ni a la cola. El aviso es un <code>messagebox</code> (Python), un <code>JOptionPane</code> (Java) o una alerta web (JavaScript).</figcaption>
+</figure>
+
+<figure>
+  <svg viewBox="0 0 770 138" role="img" aria-label="Ciclo de vida de un pedido en la cola de prioridad">
+    <text class="med" x="0" y="10">Cola ordenada por prioridad (ALTA → BAJA) y, a igual prioridad, por fecha más antigua (R1, R2):</text>
+    <rect class="paso" x="0" y="16" width="94" height="46" rx="5"/><rect class="paso" x="102" y="16" width="94" height="46" rx="5"/>
+    <rect class="paso" x="204" y="16" width="94" height="46" rx="5"/><rect class="paso" x="306" y="16" width="94" height="46" rx="5"/>
+    <rect class="paso" x="430" y="16" width="160" height="46" rx="5"/>
+    <rect class="fuera" x="610" y="16" width="160" height="46" rx="5"/>
+    <g class="tx" text-anchor="middle">
+      <text x="47" y="35" font-weight="bold">1 · PED-002</text><text x="47" y="52">ALTA · 1 nov</text>
+      <text x="149" y="35" font-weight="bold">2 · PED-003</text><text x="149" y="52">ALTA · 5 nov</text>
+      <text x="251" y="35" font-weight="bold">3 · PED-001</text><text x="251" y="52">MEDIA · 3 nov</text>
+      <text x="353" y="35" font-weight="bold">4 · PED-004</text><text x="353" y="52">BAJA · 2 nov</text>
+      <text x="510" y="35" font-weight="bold">Trabajadores 1 … N</text><text x="510" y="52">toman el siguiente (R5)</text>
+      <text x="690" y="31" font-weight="bold">Fuera de la cola (R3)</text><text x="690" y="45">ENTREGADO y</text><text x="690" y="58">CANCELADO</text>
+    </g>
+    <path class="flecha" d="M400,39 H430" marker-end="url(#pt)"/>
+    <text class="med" x="0" y="88">Cada trabajador lleva su pedido por las transiciones que le faltan (R3, R4); cada flecha tarda el retardo configurado (100 ms en las mediciones):</text>
+    <rect class="paso" x="0" y="96" width="140" height="32" rx="5"/><rect class="paso" x="170" y="96" width="140" height="32" rx="5"/>
+    <rect class="paso" x="340" y="96" width="140" height="32" rx="5"/><rect class="ok" x="510" y="96" width="140" height="32" rx="5"/>
+    <g class="tx" text-anchor="middle" font-weight="bold"><text x="70" y="117">PENDIENTE</text><text x="240" y="117">EN_PROCESO</text><text x="410" y="117">ENVIADO</text><text x="580" y="117">ENTREGADO</text></g>
+    <path class="flecha" d="M140,112 H170" marker-end="url(#pt)"/><path class="flecha" d="M310,112 H340" marker-end="url(#pt)"/><path class="flecha" d="M480,112 H510" marker-end="url(#pt)"/>
+  </svg>
+  <figcaption>Figura 5. Ciclo de vida de un pedido en la cola de prioridad con los datos de prueba (<code>PED-003</code> entra en EN_PROCESO y <code>PED-004</code> en ENVIADO, así que solo recorren 2 y 1 transiciones).</figcaption>
+</figure>
+
+<h3>8.3 El ensamblado y el login contra <code>usuarios.json</code></h3>
+<p>Las capas no se conocen entre sí; en cada lenguaje hay un solo lugar que las crea y las une (el <em>composition root</em>), con la misma estructura: se crea el almacén y se entrega a cada controlador.</p>
+<div class="archivo">python/gui/app.py · java/…/vista/AplicacionGui.java · javascript/src/servidor.js (extractos)</div>
+<pre class="partible"><span class="c"># AplicacionGUI._entrar</span>
+vista = VistaDashboard(
+    self, usuario, ControladorDashboard(almacen), ControladorFormulario(almacen, catalogo),
+    ControladorConcurrencia(almacen), al_cerrar_sesion=self._cerrar_sesion,
+)
+
+<span class="c">// AplicacionGui.entrar</span>
+VistaDashboard dashboard = <span class="k">new</span> VistaDashboard(
+        usuario, <span class="k">new</span> ControladorDashboard(almacen), <span class="k">new</span> ControladorFormulario(almacen, catalogo),
+        <span class="k">new</span> ControladorConcurrencia(almacen), <span class="k">this</span>::cerrarSesion);
+
+<span class="c">// crearApp</span>
+<span class="k">const</span> controladorFormulario = <span class="k">new</span> ControladorFormulario(almacen, catalogo);
+<span class="k">const</span> controladorConcurrencia = <span class="k">new</span> ControladorConcurrencia(almacen, despachador);
+api.use(rutasAcceso({ controladorLogin, sesiones }));
+api.use(requerirSesion(sesiones));   <span class="c">// todo lo que sigue exige haber iniciado sesión</span></pre>
+<p>Al iniciar se lee <code>datos/usuarios.json</code> (si falta o está dañado se avisa y la aplicación no abre). Al pulsar «Ingresar» el flujo es el mismo en los tres lenguajes: (1) la vista pasa usuario y contraseña al <code>ControladorLogin</code>; (2) si falta alguno se lanza <code>CamposIncompletos…</code> sin consultar el archivo; (3) <code>ServicioAutenticacion.autenticar</code> compara usuario y contraseña, tal cual, con cada registro; (4) si coinciden se abre el dashboard y, si no, se lanza <code>AutenticacionError</code>. En la versión web el servidor crea además una sesión con identificador aleatorio en una <em>cookie</em> <code>HttpOnly</code>, y la API responde 401 a quien no la tenga. Usuarios de prueba: <code>admin</code> / <code>1234</code> y <code>operador</code> / <code>ventas</code>.</p>
+
+<!-- =====================  9. ESTRUCTURAS DE DATOS  ===================== -->
+<h2>9. Comparación de estructuras de datos</h2>
+
+<table>
+  <caption>Tabla 9. La misma necesidad con la herramienta de cada lenguaje</caption>
+  <thead><tr><th style="width:18%">Necesidad</th><th style="width:26%">Python</th><th style="width:30%">Java</th><th>JavaScript</th></tr></thead>
+  <tbody>
+    <tr><td>Lista de pedidos</td><td><code>list[Pedido]</code></td><td><code>List&lt;Pedido&gt;</code> (<code>ArrayList</code>; <code>List.copyOf</code> para copias inmutables)</td><td><code>Array</code> (<code>Object.freeze([...productos])</code>)</td></tr>
+    <tr><td>Mapa id → importes</td><td><code>dict[str, Desglose]</code></td><td><code>Map&lt;String, Desglose&gt;</code> (<code>LinkedHashMap</code>, conserva el orden)</td><td><code>Map</code>; los objetos literales hacen de diccionario (<code>COSTO_ENVIO_CENTAVOS</code>)</td></tr>
+    <tr><td>Valores fijos (estado, prioridad)</td><td><code>Enum</code></td><td><code>enum</code> (tipo de verdad)</td><td><code>Object.freeze({ ALTA: 'ALTA', … })</code></td></tr>
+    <tr><td>Registro inmutable</td><td><code>@dataclass(frozen=True)</code></td><td><code>final class</code> y <code>record</code> (<code>Desglose</code>)</td><td><code>class</code> + <code>Object.freeze(this)</code></td></tr>
+    <tr><td>Dinero</td><td><code>Decimal</code></td><td><code>BigDecimal</code></td><td>entero en centavos (<code>Number</code>)</td></tr>
+  </tbody>
+</table>
+
+<p>El dinero es la diferencia de datos más importante del proyecto. Con <code>float</code> o <code>double</code> no se puede representar 0.1 exactamente y, al sumar muchos importes, el error se vuelve visible. <strong>Python</strong> lee los precios del JSON directamente como <code>Decimal</code> (<code>json.load(archivo, parse_float=Decimal)</code>; Python Software Foundation, s. f.-b), de modo que nunca pasan por <code>float</code>; <strong>Java</strong> usa <code>BigDecimal</code> con <code>setScale(2, RoundingMode.HALF_UP)</code> y lo construye a partir de texto (<code>new BigDecimal("0.16")</code>; Oracle, s. f.-a); <strong>JavaScript</strong> no tiene decimal exacto, así que convierte cada precio a <strong>centavos enteros</strong> al leerlo y solo al mostrarlo vuelve a pesos (MDN Web Docs, s. f.).</p>
+<div class="archivo">Subtotal y conversión · python/negocio.py · java/…/CalculadoraPedido.java · javascript/src/negocio.js y lectorJson.js</div>
+<pre class="partible">suma = sum((p.precio * p.cantidad <span class="k">for</span> p <span class="k">in</span> pedido.productos), Decimal("0"))
+<span class="k">return</span> redondear(suma)
+
+BigDecimal suma = pedido.getProductos().stream()
+        .map(producto -&gt; producto.getPrecio().multiply(BigDecimal.valueOf(producto.getCantidad())))
+        .reduce(BigDecimal.ZERO, BigDecimal::add);
+<span class="k">return</span> redondear(suma);
+
+<span class="k">return</span> pedido.productos.reduce((suma, producto) =&gt; suma + producto.precioCentavos * producto.cantidad, 0);
+<span class="k">return</span> Math.round(numero * 100);   <span class="c">// aCentavos: 615.33 * 100 = 61533.00000000001 → 61533</span></pre>
+<p>La conversión de JavaScript es segura con precios de dos decimales, como los del catálogo: <code>Math.round</code> absorbe el pequeño error de la multiplicación. Gracias a esto los tres lenguajes coinciden al centavo.</p>
+
+<p><strong>Serialización.</strong> Todo el intercambio de datos usa JSON (Bray, 2017), que los tres lenguajes saben leer. No hay un único archivo de datos sino varios, cada uno con su papel; la carpeta <code>datos/</code> la comparten las tres versiones.</p>
+<table>
+  <caption>Tabla 10. Archivos JSON del proyecto</caption>
+  <thead><tr><th style="width:30%">Archivo</th><th style="width:9%">Sentido</th><th>Contenido y quién lo usa</th></tr></thead>
+  <tbody>
+    <tr><td><code>datos/solicitudes_pequenas.json</code></td><td>Entrada</td><td>5 pedidos de prueba (cliente, productos, envío, prioridad, estado); lo lee el <code>LectorJson</code> de cada lenguaje.</td></tr>
+    <tr><td><code>datos/catalogo.json</code></td><td>Entrada</td><td>9 productos para los selectores del formulario.</td></tr>
+    <tr><td><code>datos/usuarios.json</code></td><td>Entrada</td><td>Usuarios del login (<code>usuario</code>, <code>password</code>, <code>nombre</code>).</td></tr>
+    <tr><td><code>*/resultados_metricas.json</code></td><td>Salida</td><td>Uno por lenguaje: tiempos, aceleración, totales y detalle por pedido; lo consume el tablero.</td></tr>
+    <tr><td><code>dashboard/datos/volumenes.json</code></td><td>Salida</td><td>Mediciones con 5, 100, 200, 300 y 400 pedidos (<code>dashboard/medir_volumenes.js</code>).</td></tr>
+  </tbody>
+</table>
+<p>Al leer, un valor desconocido en <code>"prioridad"</code> falla distinto: <code>Prioridad[...]</code> en Python lanza <code>KeyError</code>, <code>Prioridad.valueOf(...)</code> en Java lanza <code>IllegalArgumentException</code>, y en JavaScript escribimos <code>opcion(Prioridad, d.prioridad ?? 'MEDIA', 'prioridad')</code>, que lanza un <code>TypeError</code> claro porque un objeto simple devolvería <code>undefined</code> sin avisar.</p>
+
+<!-- =====================  10. MANEJO DE ERRORES  ===================== -->
+<h2>10. Comparación de manejo de errores</h2>
+
+<p>Los tres lenguajes siguen la misma política: el negocio y los controladores <strong>lanzan</strong> excepciones con un mensaje listo para leerse y la vista las <strong>atrapa</strong> y las muestra, sin dejar nada solo en la consola. Cambia el mecanismo.</p>
+
+<table>
+  <caption>Tabla 11. Mecanismos de error y cómo llegan al usuario</caption>
+  <thead><tr><th style="width:15%">Aspecto</th><th style="width:27%">Python</th><th style="width:29%">Java</th><th>JavaScript</th></tr></thead>
+  <tbody>
+    <tr><td>Sintaxis</td><td><code>try / except / else / finally</code></td><td><code>try / catch / finally</code>, <em>multi-catch</em> (<code>IOException | RuntimeException</code>)</td><td><code>try / catch</code> con <code>await</code>; <code>.catch()</code> en promesas</td></tr>
+    <tr><td>Excepciones propias</td><td><code>PedidoInvalidoError(ValueError)</code>, <code>AutenticacionError(Exception)</code></td><td><code>PedidoInvalidoException extends RuntimeException</code>, <code>AutenticacionException extends RuntimeException</code></td><td><code>class PedidoInvalidoError extends Error</code> (con <code>name</code> propio)</td></tr>
+    <tr><td>Verificadas</td><td>No existen</td><td>Sí: <code>IOException</code> obliga a declarar (<code>cargar() throws IOException</code>) o capturar; las del dominio son no verificadas (Bloch, 2018)</td><td>No existen</td></tr>
+    <tr><td>Error en segundo plano</td><td><code>_ejecutar</code> atrapa todo y lo convierte en un evento <code>ERROR</code> en la cola</td><td><code>atender</code> atrapa <code>RuntimeException</code>, guarda el texto y emite el evento <code>ERROR</code></td><td>la promesa rechaza; <code>trabajar</code> distingue <code>AbortError</code> (cancelación) de un error real</td></tr>
+    <tr><td>Hasta la pantalla</td><td><code>messagebox.showwarning</code> / <code>showerror</code></td><td><code>JOptionPane</code> con <code>WARNING_MESSAGE</code> / <code>ERROR_MESSAGE</code></td><td>servidor: JSON y estado HTTP (400, 401, 409, 422, 500); navegador: alerta (<em>toast</em>)</td></tr>
+  </tbody>
+</table>
+
+<div class="archivo">python/gui/vista_login.py · java/…/vista/PanelFormulario.java · javascript/src/api/errores.js y public/js/comun.js (extractos)</div>
+<pre class="partible"><span class="c"># VistaLogin._ingresar: dos tipos de error, dos ventanas</span>
+<span class="k">try</span>:
+    usuario = self._controlador.iniciar_sesion(self._usuario.get(), self._contrasena.get())
+<span class="k">except</span> CamposIncompletosError <span class="k">as</span> error:
+    messagebox.showwarning("Datos incompletos", str(error), parent=self)
+<span class="k">except</span> AutenticacionError <span class="k">as</span> error:
+    messagebox.showerror("Acceso denegado", str(error), parent=self)
+    self._contrasena.set("")
+
+<span class="c">// PanelFormulario.agregar: aviso (dato mal capturado) frente a error (regla de negocio)</span>
+<span class="k">try</span> {
+    controlador.agregarAlCarrito((String) producto.getSelectedItem(), cantidad.getText());
+} <span class="k">catch</span> (ErrorFormularioException error) {
+    mostrarAviso(error.getMessage());     <span class="c">// JOptionPane.WARNING_MESSAGE, título «Revisa el formulario»</span>
+} <span class="k">catch</span> (PedidoInvalidoException error) {
+    mostrarError(error.getMessage());     <span class="c">// JOptionPane.ERROR_MESSAGE, título «Pedido inválido»</span>
+}
+
+<span class="c">// errores.js: cada clase de error del dominio se traduce a un estado HTTP</span>
+['PedidoInvalidoError', { status: 422, tipo: 'negocio' }],
+['AutenticacionError',  { status: 401, tipo: 'autenticacion' }],
+<span class="k">const</span> conocido = clasificar(error);
+<span class="k">if</span> (conocido) {
+  res.status(conocido.status).json({ error: { tipo: conocido.tipo, mensaje: conocido.mensaje || error.message } });
+}
+<span class="c">// comun.js: en el navegador, el tipo decide el estilo de la alerta</span>
+<span class="k">const</span> tipo = error.tipo === 'formulario' || error.tipo === 'conflicto' ? 'aviso' : 'error';
+toast(error.message, tipo);</pre>
+<p>Python y Java hacen la traducción «excepción → ventana» dentro de la propia vista (Oracle, s. f.-d); en JavaScript hay un salto más, porque el error ocurre en el servidor y viaja como JSON: <code>manejadorDeErrores</code> lo traduce a un estado HTTP y el navegador lo vuelve alerta (con <code>role="alert"</code> para lectores de pantalla). Como red de seguridad, Python redefine <code>report_callback_exception</code> de Tkinter para que cualquier excepción que escape de un botón salga en una ventana «Error inesperado» (Python Software Foundation, s. f.-d), y Express termina en un manejador que responde 500 con un mensaje genérico y deja la traza solo en la consola del servidor (Express, s. f.). Java nos obligó a decidir qué hacer con <code>IOException</code>: <code>AplicacionGui.entrar</code> la atrapa junto con <code>RuntimeException</code> y muestra «No se pudieron cargar los datos».</p>
+
+<!-- =====================  11. SISTEMA DE TIPOS  ===================== -->
+<h2>11. Comparación del sistema de tipos</h2>
+
+<p>La misma entrada (una cantidad escrita por el usuario) se trata distinto según el sistema de tipos. En Java <code>Producto.cantidad</code> es un <code>int</code>: el compilador garantiza que no es un texto. En Python y JavaScript esa garantía no existe, así que el código la comprueba mientras corre:</p>
+<div class="archivo">Validar y convertir una cantidad · python/negocio.py y gui/controlador_formulario.py · ControladorFormulario.java · negocio.js y formulario.js</div>
+<pre class="partible"><span class="k">if not</span> isinstance(cantidad, int) <span class="k">or</span> cantidad &lt;= 0:                 <span class="c"># Python: comprobación en ejecución</span>
+<span class="k">try</span>: <span class="k">return</span> int(texto.strip())                               <span class="c"># texto → número; ValueError → ErrorFormulario</span>
+
+<span class="k">private final int</span> cantidad;                                       <span class="c">// Java: el tipo lo garantiza al compilar</span>
+<span class="k">return</span> Integer.parseInt(limpio);                              <span class="c">// texto → número; NumberFormatException → ErrorFormularioException</span>
+
+<span class="k">if</span> (!Number.isInteger(cantidad) || cantidad &lt;= 0) {            <span class="c">// JavaScript: comprobación en ejecución</span>
+<span class="k">if</span> (!/^[+-]?\d+$/.test(texto)) {                             <span class="c">// formulario.js: filtro antes de convertir</span></pre>
+<p>El filtro con expresión regular de JavaScript existe por una razón concreta: con tipado débil, <code>Number('')</code> da <code>0</code> y <code>Number('1e3')</code> da <code>1000</code>, así que convertir directamente aceptaría entradas que el usuario no quiso escribir. La Tabla 12 muestra los mismos estímulos en los tres lenguajes (resultados comprobados en un intérprete de cada uno).</p>
+
+<table>
+  <caption>Tabla 12. Fuerte frente a débil, estático frente a dinámico</caption>
+  <thead><tr><th style="width:21%">Expresión</th><th style="width:26%">Python (dinámico, fuerte)</th><th style="width:28%">Java (estático, fuerte)</th><th>JavaScript (dinámico, débil)</th></tr></thead>
+  <tbody>
+    <tr><td><code>"5" + 2</code></td><td><code>TypeError</code> en ejecución</td><td><code>"52"</code> (concatenación definida por el lenguaje)</td><td><code>'52'</code> (convierte el 2 a texto)</td></tr>
+    <tr><td><code>"5" - 2</code></td><td><code>TypeError</code> en ejecución</td><td>no compila (<em>bad operand types</em>)</td><td><code>3</code> (convierte el texto a número)</td></tr>
+    <tr><td>convertir <code>"1e3"</code></td><td><code>int("1e3")</code> → <code>ValueError</code></td><td><code>Integer.parseInt("1e3")</code> → <code>NumberFormatException</code></td><td><code>Number('1e3')</code> → <code>1000</code></td></tr>
+    <tr><td>convertir <code>""</code></td><td><code>int("")</code> → <code>ValueError</code></td><td><code>Integer.parseInt("")</code> → <code>NumberFormatException</code></td><td><code>Number('')</code> → <code>0</code></td></tr>
+    <tr><td>restar fechas</td><td><code>datetime - datetime</code> da un <code>timedelta</code></td><td><code>LocalDateTime</code> no admite <code>-</code>: hay que llamar a un comparador</td><td><code>a.fecha - b.fecha</code> funciona: el objeto <code>Date</code> se convierte a número</td></tr>
+  </tbody>
+</table>
+<p>La última fila es código real nuestro: <code>ordenarPorPrioridad</code> (apartado 7) desempata con <code>a.fecha - b.fecha</code>, que solo funciona por la coerción de JavaScript. Es cómodo, pero un error de tipo no avisa: un <code>undefined</code> en <code>fecha</code> daría <code>NaN</code> y el orden quedaría roto sin ninguna excepción. Python falla con un <code>TypeError</code> claro y Java impide el problema antes de ejecutar (Ramalho, 2022; MDN Web Docs, s. f.).</p>
+
+<!-- =====================  12. EJECUCIÓN Y COMPILACIÓN  ===================== -->
+<h2>12. Comparación de ejecución y compilación</h2>
+
+<table>
+  <caption>Tabla 13. Del código fuente a la ejecución, con la evidencia de <code>resultados_metricas.json</code></caption>
+  <thead><tr><th style="width:15%">Etapa</th><th style="width:27%">Python 3.14.7</th><th style="width:29%">Java 25.0.4</th><th>Node.js 24.21.0</th></tr></thead>
+  <tbody>
+    <tr><td>Traducción</td><td>CPython compila cada módulo a <em>bytecode</em> al importarlo y lo guarda en <code>__pycache__/*.pyc</code></td><td><code>javac</code> (vía Maven: <code>compile</code>) genera <code>target/classes/*.class</code> antes de correr</td><td>V8 analiza el módulo y genera <em>bytecode</em> con Ignition al cargarlo (McIlroy, 2016)</td></tr>
+    <tr><td>Ejecución</td><td>Bucle de la máquina virtual de CPython, instrucción por instrucción</td><td>La JVM carga las clases, las verifica, las interpreta y compila a código nativo los métodos «calientes» (JIT)</td><td>Ignition interpreta; TurboFan compila las funciones calientes</td></tr>
+    <tr><td>Concurrencia del motor</td><td>GIL: un hilo ejecuta <em>bytecode</em> a la vez (Python Software Foundation, s. f.-c)</td><td>Hilos nativos del sistema operativo sobre varios núcleos</td><td>Un hilo para el JavaScript; el bucle de eventos (libuv) atiende temporizadores y E/S (OpenJS Foundation, s. f.)</td></tr>
+    <tr><td>Cómo la lanzamos</td><td><code>python main.py</code>, <code>python main_gui.py</code></td><td><code>.\mvnw.cmd -q compile exec:java</code> (Maven Wrapper)</td><td><code>npm run consola</code>, <code>npm start</code></td></tr>
+    <tr><td>Lectura del JSON (ms)</td><td>0.497</td><td>63.846</td><td>3.759</td></tr>
+    <tr><td>Validación y cálculo (ms)</td><td>0.240</td><td>9.317</td><td>0.506</td></tr>
+  </tbody>
+</table>
+<p>Las dos últimas filas son mediciones reales de la corrida de consola con los 5 pedidos de prueba. Java es entre 10 y 130 veces más lento en estas etapas cortas: la primera lectura incluye cargar las clases de Gson y calentar la JVM, un costo que se paga una sola vez y que el JIT compensa en procesos largos (que no medimos). La diferencia entre «compilar antes» (Java) y «traducir al cargar» (Python y Node.js) también se siente al trabajar: en Java un error de tipo aparece en <code>mvnw compile</code> y no cuando alguien usa la pantalla.</p>
+
+<!-- =====================  13. CONCURRENCIA  ===================== -->
+<h2>13. Comparación de concurrencia o asincronía</h2>
+
+<p>El despachador procesa la cola en segundo plano con N trabajadores y avisa cada cambio de estado. La diferencia más importante entre los tres modelos es <strong>cómo se entera la pantalla</strong> sin congelarse.</p>
+
+<table>
+  <caption>Tabla 14. Modelos de concurrencia en el despachador</caption>
+  <thead><tr><th style="width:15%">Aspecto</th><th style="width:27%">Python</th><th style="width:29%">Java</th><th>JavaScript</th></tr></thead>
+  <tbody>
+    <tr><td>Unidad de trabajo</td><td>Corrutina <code>asyncio</code> dentro de un <code>threading.Thread</code></td><td>Tarea en un <code>ExecutorService</code> (hilos del sistema)</td><td>Función <code>async</code> / promesa</td></tr>
+    <tr><td>Paralelismo real</td><td>No (GIL); las esperas se traslapan</td><td>Sí, en varios núcleos</td><td>No: un hilo; las esperas se traslapan</td></tr>
+    <tr><td>Aviso a la interfaz</td><td><code>queue.Queue</code> + <code>after()</code> cada 50 ms en el hilo principal</td><td>Oyentes + <code>SwingUtilities.invokeLater</code></td><td>El servidor anota el estado y el navegador pregunta con <code>fetch()</code> cada 500 ms</td></tr>
+    <tr><td>Sincronización</td><td><code>threading.Lock</code> sobre los datos compartidos</td><td><code>synchronized</code> y <code>volatile</code></td><td>Ninguna (no hay hilos concurrentes)</td></tr>
+  </tbody>
+</table>
+
+<div class="archivo">python/despachador.py y gui/vista_concurrencia.py (extractos)</div>
+<pre class="partible"><span class="c"># Despachador.iniciar: el hilo de fondo corre el bucle de asyncio</span>
+self._hilo = threading.Thread(
+    target=self._ejecutar, args=(cola, retardo_ms, max(1, trabajadores)), daemon=True
+)
+self._hilo.start()
+<span class="c"># _correr: N trabajadores toman pedidos de la cola; _avisar solo deja un evento en la cola de eventos</span>
+<span class="k">await</span> asyncio.gather(*(self._trabajar(n) <span class="k">for</span> n <span class="k">in</span> range(1, cantidad + 1)))
+self._eventos.put(EventoDespacho(tipo, pedido_id, trabajador, anterior, nuevo, detalle, self._ms()))
+<span class="c"># VistaConcurrencia._tick: en el hilo principal, cada 50 ms (Tkinter no es seguro entre hilos)</span>
+eventos = self._controlador.eventos()
+self._cancelar_tick = self.after(INTERVALO_MS, self._tick)</pre>
+<div class="archivo">java/…/concurrencia/Despachador.java y vista/PanelConcurrencia.java (extractos)</div>
+<pre class="partible">hilos = Executors.newFixedThreadPool(Math.min(trabajadores, cola.size()));
+coordinador = <span class="k">new</span> Thread(() -&gt; correr(cola, retardoMs), "Despachador");
+<span class="k">for</span> (Pedido pedido : cola) {
+    hilos.submit(() -&gt; atender(pedido, retardoMs));   <span class="c">// por prioridad; cada hilo avisa por su cuenta</span>
+}
+hilos.shutdown();
+<span class="c">// PanelConcurrencia: el aviso llega desde un hilo de trabajo; Swing solo se toca desde su hilo de eventos</span>
+controlador.agregarOyente(evento -&gt; SwingUtilities.invokeLater(() -&gt; aplicar(evento)));</pre>
+<div class="archivo">javascript/src/despachador.js y public/js/dashboard.js (extractos)</div>
+<pre class="partible"><span class="k">const</span> cantidad = Math.min(trabajadores, total);
+<span class="k">for</span> (<span class="k">let</span> numero = 1; numero &lt;= cantidad; numero++) {
+  trabajos.push(<span class="k">this</span>.trabajar(numero, retardoMs));   <span class="c">// while (hay pendientes) await atender()</span>
+}
+<span class="k">await</span> Promise.all(trabajos);
+<span class="c">// dashboard.js: el navegador pregunta, el servidor responde; no hay conexiones abiertas</span>
+setInterval(<span class="k">async</span> () =&gt; {
+  <span class="k">await</span> pedidos.consultar(false);          <span class="c">// GET /api/pedidos</span>
+  <span class="k">await</span> concurrencia.consultar();          <span class="c">// GET /api/despachador</span>
+}, INTERVALO_MS);                             <span class="c">// INTERVALO_MS = 500</span></pre>
+<p>En <strong>Python</strong>, Tkinter solo permite tocar widgets desde el hilo principal (Python Software Foundation, s. f.-d); por eso el despachador deja <code>EventoDespacho</code> en una <code>queue.Queue</code> (segura entre hilos) y la ventana la vacía con <code>after()</code> cada 50 ms (Python Software Foundation, s. f.-a, s. f.-c). En <strong>Java</strong> los hilos son reales, así que hay carreras posibles: <code>estado</code> es <code>volatile</code>, los contadores usan <code>synchronized</code> y la vista pasa cada evento al hilo de eventos con <code>invokeLater</code> (Oracle, s. f.-b, s. f.-c; Goetz et al., 2006). En <strong>JavaScript</strong> no hay hilos que sincronizar: el servidor solo anota su estado y el navegador consulta cada 500 ms, con una bandera <code>consultando</code> que evita encimar consultas (OpenJS Foundation, s. f.); el precio es tráfico constante aunque no haya cambios.</p>
+
+<!-- =====================  14. RESULTADOS  ===================== -->
+<h2>14. Resultados de las pruebas</h2>
+
+<h3>14.1 Las 24 pruebas unitarias</h3>
+<p>Cada lenguaje tiene 8 pruebas con el mismo contenido (pytest, JUnit 5 y Jest; pytest-dev, s. f.; JUnit Team, s. f.; Jest, s. f.). Las verificamos el 14 de noviembre de 2026: Python 8/8 (0.24 s), JavaScript 8/8 (2.5 s) y Java 8/8 con Maven. En total, 24 de 24.</p>
+
+<table>
+  <caption>Tabla 15. Las 8 pruebas por lenguaje, con el nombre que tiene cada una en el código (1 a 5: <code>test_pedidos.py</code>, <code>PedidosTest</code>, <code>pedidos.test.js</code>)</caption>
+  <thead><tr><th style="width:3%">#</th><th style="width:22%">Qué evalúa (entrada)</th><th style="width:17%">Resultado esperado</th><th style="width:19%">Python</th><th style="width:20%">Java</th><th>JavaScript</th></tr></thead>
+  <tbody>
+    <tr><td>1</td><td>Cliente regular, líneas 899.50 × 2 y 349.90 × 1, envío estándar</td><td><i>S</i> 2,148.90; <i>D</i> 214.89; <i>I</i> 309.44; <i>E</i> 50.00; <i>T</i> 2,293.45</td><td class="nom">test_descuento_del_10_por_monto_con_iva_y_envio_estandar</td><td class="nom">descuentoDel10PorMontoConIvaYEnvioEstandar</td><td class="nom">descuento del 10% por monto, con IVA y envío estándar</td></tr>
+    <tr><td>2</td><td>Cliente frecuente, express: (615.33 × 1, 89.99 × 3) y (3,299.00 × 1, 450.50 × 1)</td><td><i>D</i> 44.27 y <i>T</i> 1,095.59; <i>D</i> 374.95 (solo 10 %) y <i>T</i> 4,034.48</td><td class="nom">test_descuento_frecuente_del_5_y_no_acumulable_con_el_de_monto</td><td class="nom">descuentoFrecuenteDel5YNoAcumulable</td><td class="nom">descuento frecuente del 5% y no acumulable con el de monto</td></tr>
+    <tr><td>3</td><td>Pedido con una línea de cantidad 0 y otro con cantidad −3</td><td>Excepción «cantidad inválida» al validar y al calcular</td><td class="nom">test_cantidad_cero_o_negativa_lanza_excepcion</td><td class="nom">cantidadCeroONegativaLanzaExcepcion</td><td class="nom">cantidad cero o negativa lanza excepción</td></tr>
+    <tr><td>4</td><td>Pedido con lista de productos vacía</td><td>Excepción «no tiene productos»</td><td class="nom">test_pedido_sin_productos_lanza_excepcion</td><td class="nom">pedidoSinProductosLanzaExcepcion</td><td class="nom">pedido sin productos lanza excepción</td></tr>
+    <tr><td>5</td><td>Lectura de <code>solicitudes_pequenas.json</code> y consultas funcionales</td><td>5 leídos; cliente C001 → PED-001, PED-004; orden por prioridad PED-002, 003, 001, 005, 004; lista original intacta</td><td class="nom">test_consultas_funcionales_sobre_el_json_de_prueba</td><td class="nom">consultasFuncionalesSobreElJsonDePrueba</td><td class="nom">consultas funcionales sobre el JSON de prueba</td></tr>
+    <tr><td>6</td><td>Login con <code>admin</code>/<code>1234</code>, contraseña mala, usuario inexistente y campos vacíos</td><td>«Administrador»; error «incorrectos» (×2); <code>CamposIncompletos</code></td><td class="nom">test_login_acepta_al_usuario_valido_y_rechaza_los_demas_casos</td><td class="nom">loginAceptaAlUsuarioValidoYRechazaLosDemasCasos</td><td class="nom">login: acepta al usuario válido y rechaza los demás casos</td></tr>
+    <tr><td>7</td><td>Formulario: cantidad «abc», cantidad «0» y dos veces 1 teclado; cliente C005 regular, estándar</td><td>Error de formulario; error de negocio; pedido PED-006 con total 2,136.84 (1,799.00 + IVA 287.84 + 50.00); 5 pedidos</td><td class="nom">test_formulario_valida_la_captura_y_registra_un_pedido_nuevo</td><td class="nom">formularioValidaLaCapturaYRegistraUnPedidoNuevo</td><td class="nom">formulario: valida la captura y registra un pedido nuevo</td></tr>
+    <tr><td>8</td><td>Despachador con 2 trabajadores y 20 ms de retardo sobre los pedidos cargados</td><td>Todos ENTREGADO; primero en iniciar PED-002; último evento <code>CORRIDA_TERMINADA</code>; sin corrida activa</td><td class="nom">test_despachador_lleva_todos_los_pedidos_a_entregado_empezando_por_la_prioridad_alta</td><td class="nom">despachadorLlevaTodosLosPedidosAEntregadoEmpezandoPorLaPrioridadAlta</td><td class="nom">despachador: lleva todos los pedidos a ENTREGADO empezando por la prioridad alta</td></tr>
+  </tbody>
+</table>
+<p><strong>Hallazgo sobre la prueba 8 en Java.</strong> En una de las 12 corridas de verificación, <code>DespachadorTest</code> falló: esperaba <code>PED-002</code> como primer pedido iniciado y llegó <code>PED-003</code>. Se explica porque con 2 hilos reales las dos tareas arrancan casi a la vez y el orden en que cada hilo registra su evento <code>PEDIDO_INICIADO</code> no está garantizado, aunque las tareas sí se envían al <em>pool</em> por prioridad; en las 10 repeticiones siguientes pasó. En Python y JavaScript la prueba es determinista porque los trabajadores son corrutinas de un solo hilo: un ejemplo real de cómo los hilos introducen no determinismo, incluso en las pruebas.</p>
+
+<h3>14.2 Consistencia del total y tiempos medidos</h3>
+<p>Los tres <code>resultados_metricas.json</code> reportan los mismos importes: subtotal 7,548.30; descuentos 634.11; IVA 1,106.27; envío 340.00; total <strong>8,360.46</strong>, con 5 pedidos leídos, 4 registrados y 1 rechazado (<code>PED-005</code>). El benchmark por volúmenes confirma la consistencia: con 100 pedidos (el mismo lote repetido 20 veces) el total es 167,209.20 = 8,360.46 × 20 en los tres lenguajes (<code>totales_coinciden: true</code>).</p>
+
+<table>
+  <caption>Tabla 16. <code>resultados_metricas.json</code>: corrida de consola con 5 pedidos (100 ms por transición)</caption>
+  <thead><tr><th style="width:34%">Métrica</th><th class="num" style="width:22%">Python</th><th class="num" style="width:22%">Java</th><th class="num">JavaScript</th></tr></thead>
+  <tbody>
+    <tr><td>Lectura del JSON (ms)</td><td class="num">0.497</td><td class="num">63.846</td><td class="num">3.759</td></tr>
+    <tr><td>Validación y cálculo (ms)</td><td class="num">0.240</td><td class="num">9.317</td><td class="num">0.506</td></tr>
+    <tr><td>Cambio de estados secuencial (ms)</td><td class="num">973.349</td><td class="num">973.618</td><td class="num">951.578</td></tr>
+    <tr><td>Cambio de estados concurrente (ms)</td><td class="num">333.159</td><td class="num">326.439</td><td class="num">333.120</td></tr>
+    <tr><td>Total de la corrida (ms)</td><td class="num">1,307.912</td><td class="num">1,382.787</td><td class="num">1,289.806</td></tr>
+    <tr class="total"><td>Aceleración (secuencial ÷ concurrente)</td><td class="num">2.92×</td><td class="num">2.98×</td><td class="num">2.86×</td></tr>
+  </tbody>
+</table>
+<p>Con 9 transiciones y un pedido más largo de 3, la aceleración máxima teórica es 3×, y los tres lenguajes se acercan a ella. La diferencia aparece al aumentar los pedidos (Tabla 17, generada con <code>dashboard/medir_volumenes.js</code>, que repite los 5 pedidos de prueba con el 20 % inválido):</p>
+
+<table>
+  <caption>Tabla 17. Tiempo concurrente y aceleración según el volumen (tiempo secuencial de Python como referencia)</caption>
+  <thead><tr><th style="width:14%">Pedidos (válidos)</th><th class="num" style="width:16%">Secuencial (s)</th><th class="num" style="width:23%">Python</th><th class="num" style="width:23%">Java</th><th class="num">JavaScript</th></tr></thead>
+  <tbody>
+    <tr><td>5 (4)</td><td class="num">0.98</td><td class="num">0.32 s · 3.05×</td><td class="num">0.31 s · 2.94×</td><td class="num">0.32 s · 3.05×</td></tr>
+    <tr><td>100 (80)</td><td class="num">19.32</td><td class="num">0.32 s · 60.83×</td><td class="num">1.42 s · 13.49×</td><td class="num">0.32 s · 60.03×</td></tr>
+    <tr><td>200 (160)</td><td class="num">38.95</td><td class="num">0.32 s · 120.29×</td><td class="num">2.59 s · 15.02×</td><td class="num">0.32 s · 121.30×</td></tr>
+    <tr><td>300 (240)</td><td class="num">58.48</td><td class="num">0.33 s · 178.12×</td><td class="num">3.78 s · 15.47×</td><td class="num">0.32 s · 180.58×</td></tr>
+    <tr><td>400 (320)</td><td class="num">77.92</td><td class="num">0.33 s · 237.04×</td><td class="num">5.00 s · 15.55×</td><td class="num">0.33 s · 239.07×</td></tr>
+  </tbody>
+</table>
+<p>Python y JavaScript mantienen el mismo tiempo (≈ 0.33 s) sin importar el volumen: las esperas simuladas no ocupan el procesador y se traslapan por completo, así que el total es el de la cadena más larga (3 transiciones). Java crece casi linealmente porque su procesamiento concurrente usa un <em>pool</em> acotado (<code>MAXIMO_HILOS = 16</code>): 77.8 s ÷ 16 ≈ 4.9 s, que coincide con los 5.0 s medidos. Es un límite de diseño nuestro, no de Java: un <em>pool</em> mayor lo reduciría. Son mediciones de <em>esperas</em> (como E/S), no de cálculo intensivo, en una sola máquina.</p>
+
+<h3>14.3 Líneas de código por módulo</h3>
+<table>
+  <caption>Tabla 18. LOC reales por módulo (sin líneas en blanco ni comentarios; entre paréntesis, archivos)</caption>
+  <thead><tr><th style="width:34%">Módulo</th><th class="num" style="width:22%">Python</th><th class="num" style="width:22%">Java</th><th class="num">JavaScript</th></tr></thead>
+  <tbody>
+    <tr><td>Modelos y datos</td><td class="num">165 (4)</td><td class="num">327 (12)</td><td class="num">253 (5)</td></tr>
+    <tr><td>Negocio y validación</td><td class="num">76 (1)</td><td class="num">90 (4)</td><td class="num">98 (1)</td></tr>
+    <tr><td>Consultas funcionales</td><td class="num">36 (1)</td><td class="num">68 (1)</td><td class="num">39 (1)</td></tr>
+    <tr><td>Concurrencia y despachador</td><td class="num">210 (2)</td><td class="num">272 (8)</td><td class="num">235 (2)</td></tr>
+    <tr><td>Login (seguridad)</td><td class="num">24 (1)</td><td class="num">50 (3)</td><td class="num">37 (1)</td></tr>
+    <tr><td>Controladores</td><td class="num">285 (5)</td><td class="num">464 (8)</td><td class="num">390 (6)</td></tr>
+    <tr><td>Interfaz (vistas / páginas web)</td><td class="num">768 (7)</td><td class="num">1,409 (11)</td><td class="num">1,492 (10)</td></tr>
+    <tr><td>Servidor HTTP y sesiones</td><td class="num">—</td><td class="num">—</td><td class="num">481 (10)</td></tr>
+    <tr><td>Entrada de consola</td><td class="num">168 (1)</td><td class="num">186 (1)</td><td class="num">187 (1)</td></tr>
+    <tr><td>Pruebas (8 por lenguaje)</td><td class="num">147 (4)</td><td class="num">201 (4)</td><td class="num">148 (4)</td></tr>
+    <tr class="total"><td>Total</td><td class="num">1,879 (27)</td><td class="num">3,067 (52)</td><td class="num">3,360 (41)</td></tr>
+  </tbody>
+</table>
+<p>Sin contar pruebas, Python tiene 1,732 LOC, Java 2,866 y JavaScript 3,212; la interfaz es la mayor parte de la diferencia (768, 1,409 y 1,492). Modelos, negocio, consultas, concurrencia y login, en cambio, son parecidos: 511, 807 y 662 LOC. JavaScript incluye además el HTML y el CSS de la interfaz y el servidor HTTP. El tablero comparativo (<code>dashboard/</code>) suma 1,462 LOC más y no está contado.</p>
+
+<!-- =====================  15. VENTAJAS Y LIMITACIONES  ===================== -->
+<h2>15. Ventajas y limitaciones</h2>
+
+<p>La evaluación sale de haber construido las tres versiones y sus interfaces; donde hay un número, es una medición de este proyecto.</p>
+<table>
+  <caption>Tabla 19. Ventajas y limitaciones según nuestra experiencia</caption>
+  <thead><tr><th style="width:11%">Lenguaje</th><th style="width:45%">Ventajas</th><th>Limitaciones</th></tr></thead>
+  <tbody>
+    <tr><td>Python</td><td>Menos código (1,732 LOC frente a 2,866 y 3,212); Tkinter y <code>Decimal</code> vienen incluidos; arranque inmediato (lectura del JSON en 0.5 ms); pruebas sencillas con pytest.</td><td>El tipado dinámico obliga a validar tipos con el programa corriendo; Tkinter no es seguro entre hilos (cola y <code>after()</code>); el aspecto de la interfaz exige escribir estilos propios (<code>estilos.py</code>); el GIL impide paralelismo de cálculo.</td></tr>
+    <tr><td>Java</td><td>El compilador detecta errores de tipo antes de ejecutar; <code>BigDecimal</code>, <code>enum</code> y <code>record</code> modelan bien el dominio; hilos reales y un <em>pool</em> listo; Swing viene en el JDK.</td><td>Es lo más verboso (52 archivos, 3,067 LOC); arranque lento (63.8 ms para leer el JSON); nuestro <em>pool</em> de 16 hilos limita la escala (5.0 s con 400 pedidos); la prueba del despachador mostró una falla intermitente por no determinismo.</td></tr>
+    <tr><td>JavaScript</td><td>Un solo lenguaje para el servidor y la interfaz; <code>async/await</code> hace sencilla la espera concurrente (0.33 s con 400 pedidos); la interfaz web es flexible y accesible.</td><td>Sin decimal exacto (centavos a mano); el tipado débil nos obligó a filtros con expresiones regulares; más LOC (3,212, con HTML y CSS); requiere servidor, sesiones y cabeceras de seguridad; el <em>polling</em> de 500 ms genera tráfico constante.</td></tr>
+  </tbody>
+</table>
+<p>Ninguna versión fue «la mejor» en todo: Python ganó en brevedad y arranque, Java en garantías del compilador y JavaScript en simplicidad de la espera concurrente y de la interfaz.</p>
+
+<!-- =====================  16. MANTENIBILIDAD Y ESCALABILIDAD  ===================== -->
+<h2>16. Reflexión sobre mantenibilidad y escalabilidad</h2>
+
+<p>La separación en capas hace que cada cambio toque pocos archivos: la dependencia va en una sola dirección (vista → controlador → modelo; Martin, 2017) y las reglas se prueban sin abrir una ventana.</p>
+<table>
+  <caption>Tabla 20. Qué se toca y qué no ante un cambio (nombres reales de nuestros archivos)</caption>
+  <thead><tr><th style="width:23%">Cambio</th><th style="width:44%">Qué se modifica</th><th>Qué no cambia</th></tr></thead>
+  <tbody>
+    <tr><td>Cambiar el umbral o el porcentaje de un descuento</td><td>Constantes <code>UMBRAL_DESCUENTO_MONTO</code> y <code>DESCUENTO_*</code> en <code>negocio.py</code>, <code>CalculadoraPedido.java</code> o <code>negocio.js</code>, y la prueba 2</td><td>Vistas, controladores, almacén y API</td></tr>
+    <tr><td>Agregar un descuento nuevo (por ejemplo, por cantidad de piezas)</td><td>Un <code>if</code> más en <code>tasa_descuento</code> / <code>tasaDescuento</code> / <code>porcentajeDescuento</code>, y una prueba</td><td>La vista previa del formulario y la tabla: ya llaman a <code>CalculadoraPedido.desglose</code></td></tr>
+    <tr><td>Agregar un tipo de envío</td><td>El enumerado <code>TipoEnvio</code>, <code>COSTO_ENVIO</code> y su etiqueta en <code>etiquetas</code></td><td>Cálculo de descuentos e IVA</td></tr>
+    <tr><td>Migrar los JSON a una base de datos relacional</td><td>Solo el acceso a datos: <code>lector_json</code> / <code>LectorJson</code> / <code>lectorJson.js</code>, <code>AlmacenPedidos</code> (<code>cargar</code>, <code>registrar</code>), el catálogo y <code>ServicioAutenticacion</code></td><td><code>CalculadoraPedido</code>, consultas funcionales, controladores y vistas</td></tr>
+  </tbody>
+</table>
+<p>Para la migración, el almacén se convertiría en un <em>repositorio</em> (Fowler, 2002) y las reglas pasarían a la base como restricciones. Una propuesta (no implementada) de esquema, con el dinero como <code>DECIMAL</code> por la misma razón que usamos <code>Decimal</code> y <code>BigDecimal</code>:</p>
+<pre class="sola"><span class="c">-- Propuesta: la regla «cantidad &gt; 0» también quedaría en la base de datos</span>
+<span class="k">CREATE TABLE</span> pedidos (id TEXT <span class="k">PRIMARY KEY</span>, cliente_id TEXT <span class="k">NOT NULL</span>, fecha TIMESTAMP <span class="k">NOT NULL</span>,
+                      envio TEXT <span class="k">NOT NULL</span>, prioridad TEXT <span class="k">NOT NULL</span>, estado TEXT <span class="k">NOT NULL</span>);
+<span class="k">CREATE TABLE</span> pedido_lineas (pedido_id TEXT <span class="k">REFERENCES</span> pedidos(id), sku TEXT <span class="k">NOT NULL</span>,
+                      cantidad INTEGER <span class="k">NOT NULL CHECK</span> (cantidad &gt; 0), precio DECIMAL(12,2) <span class="k">NOT NULL</span>);</pre>
+<p><strong>Escalabilidad.</strong> Hoy el almacén y las sesiones viven en memoria de un solo proceso: no se pueden repartir entre varios servidores sin moverlos a una base o a un almacén compartido. El <em>polling</em> de 500 ms hace dos consultas por segundo por navegador abierto; con muchos usuarios convendría pasar a eventos enviados por el servidor o WebSockets. Y la Tabla 17 muestra el límite que sí medimos: el <em>pool</em> de 16 hilos de Java frena la aceleración en ≈ 15× mientras Python y JavaScript llegan a ≈ 240× con esperas simuladas; con trabajo de CPU habría que volver a medir.</p>
+
+<!-- =====================  17. CONCLUSIONES  ===================== -->
+<h2>17. Conclusiones</h2>
+
+<p>Con evidencia de nuestro propio proyecto, llegamos a estos hallazgos: (1) <strong>la arquitectura importó más que el lenguaje</strong>: gracias a MVC, las tres versiones comparten reglas y producen el mismo total de $8,360.46, y una regla nueva se agrega en un solo método (Sommerville, 2016); (2) <strong>el tipado cambia dónde aparecen los errores</strong>: Java los detecta al compilar, Python los lanza al ejecutar y JavaScript a veces ni los lanza (<code>a.fecha - b.fecha</code>); (3) <strong>la concurrencia cambia cómo se avisa a la pantalla</strong>: cola con <code>after()</code> en Python, <code>invokeLater</code> en Java y <em>polling</em> en JavaScript; (4) <strong>el dinero exige una decisión consciente</strong> en cada lenguaje; y (5) la aceleración medida (hasta ≈ 240×) depende tanto del diseño (<em>pool</em> de 16 hilos) como del lenguaje.</p>
+
+<table>
+  <caption>Tabla 21. Qué lenguaje elegiríamos según el tipo de proyecto</caption>
+  <thead><tr><th style="width:28%">Tipo de proyecto</th><th style="width:15%">Elección</th><th>Por qué (evidencia del proyecto)</th></tr></thead>
+  <tbody>
+    <tr><td>Prototipos, automatización, procesamiento de archivos</td><td>Python</td><td>Es lo más breve (1,732 LOC) y arranca al instante; <code>Decimal</code> y Tkinter vienen incluidos.</td></tr>
+    <tr><td>Sistemas grandes y duraderos con varios equipos</td><td>Java</td><td>El compilador y el tipado estático detectan errores pronto; hilos reales; a costa de más código y arranque lento.</td></tr>
+    <tr><td>Aplicaciones web y de muchas esperas (E/S)</td><td>JavaScript / Node.js</td><td>Un solo lenguaje para servidor e interfaz; <code>async/await</code> escaló a 400 pedidos en 0.33 s; hay que cuidar el tipado con pruebas.</td></tr>
+  </tbody>
+</table>
+<p>Nuestras conclusiones se limitan a un sistema con esperas simuladas, una sola computadora y 5 pedidos de muestra; no medimos cálculo intensivo ni memoria. Nos llevamos que comparar lenguajes con el <em>mismo</em> problema y las <em>mismas</em> pruebas es lo que muestra sus diferencias reales, y que una prueba también puede fallar por la concurrencia y no solo por la lógica.</p>
+
+<!-- =====================  18. REFERENCIAS  ===================== -->
+<h2 class="nueva-pagina">18. Referencias bibliográficas y técnicas</h2>
+<div class="refs">
+<p>Bloch, J. (2018). <em>Effective Java</em> (3.ª ed.). Addison-Wesley.</p>
+<p>Bray, T. (Ed.). (2017). <em>The JavaScript Object Notation (JSON) data interchange format</em> (RFC 8259). Internet Engineering Task Force. https://www.rfc-editor.org/info/rfc8259</p>
+<p>Chart.js contributors. (s. f.). <em>Chart.js documentation</em>. https://www.chartjs.org/docs/latest/</p>
+<p>Express. (s. f.). <em>Error handling</em>. https://expressjs.com/en/guide/error-handling.html</p>
+<p>Fowler, M. (2002). <em>Patterns of enterprise application architecture</em>. Addison-Wesley.</p>
+<p>Gamma, E., Helm, R., Johnson, R. y Vlissides, J. (1994). <em>Design patterns: Elements of reusable object-oriented software</em>. Addison-Wesley.</p>
+<p>Goetz, B., Peierls, T., Bloch, J., Bowbeer, J., Holmes, D. y Lea, D. (2006). <em>Java concurrency in practice</em>. Addison-Wesley.</p>
+<p>Jest. (s. f.). <em>Getting started</em>. https://jestjs.io/docs/getting-started</p>
+<p>JUnit Team. (s. f.). <em>JUnit 5 user guide</em>. https://junit.org/junit5/docs/current/user-guide/</p>
+<p>Martin, R. C. (2017). <em>Clean architecture: A craftsman’s guide to software structure and design</em>. Prentice Hall.</p>
+<p>McIlroy, R. (2016, 23 de agosto). <em>Firing up the Ignition interpreter</em>. V8. https://v8.dev/blog/ignition-interpreter</p>
+<p>MDN Web Docs. (s. f.). <em>JavaScript data types and data structures</em>. Mozilla. https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures</p>
+<p>Mermaid contributors. (s. f.). <em>Mermaid documentation</em>. https://mermaid.js.org/</p>
+<p>OpenJS Foundation. (s. f.). <em>The Node.js event loop</em>. Node.js. https://nodejs.org/en/learn/asynchronous-work/event-loop-timers-and-nexttick</p>
+<p>Oracle. (s. f.-a). <em>BigDecimal (Java SE 17 &amp; JDK 17)</em>. Java Platform, Standard Edition API Specification. https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/math/BigDecimal.html</p>
+<p>Oracle. (s. f.-b). <em>Concurrency in Swing</em>. The Java Tutorials. https://docs.oracle.com/javase/tutorial/uiswing/concurrency/index.html</p>
+<p>Oracle. (s. f.-c). <em>ExecutorService (Java SE 17 &amp; JDK 17)</em>. Java Platform, Standard Edition API Specification. https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/concurrent/ExecutorService.html</p>
+<p>Oracle. (s. f.-d). <em>How to make dialogs</em>. The Java Tutorials. https://docs.oracle.com/javase/tutorial/uiswing/components/dialog.html</p>
+<p>pytest-dev. (s. f.). <em>pytest documentation</em>. https://docs.pytest.org/en/stable/</p>
+<p>Python Software Foundation. (s. f.-a). <em>asyncio — Asynchronous I/O</em>. Python 3 documentation. https://docs.python.org/3/library/asyncio.html</p>
+<p>Python Software Foundation. (s. f.-b). <em>decimal — Decimal fixed-point and floating-point arithmetic</em>. Python 3 documentation. https://docs.python.org/3/library/decimal.html</p>
+<p>Python Software Foundation. (s. f.-c). <em>threading — Thread-based parallelism</em>. Python 3 documentation. https://docs.python.org/3/library/threading.html</p>
+<p>Python Software Foundation. (s. f.-d). <em>tkinter — Python interface to Tcl/Tk</em>. Python 3 documentation. https://docs.python.org/3/library/tkinter.html</p>
+<p>Ramalho, L. (2022). <em>Fluent Python: Clear, concise, and effective programming</em> (2.ª ed.). O’Reilly Media.</p>
+<p>Sommerville, I. (2016). <em>Software engineering</em> (10.ª ed.). Pearson.</p>
+</div>
+
+</body>
+</html>
