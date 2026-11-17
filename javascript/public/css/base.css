@@ -1,0 +1,256 @@
+/*
+ * Estilos base de la interfaz web: colores, controles, pantalla de login y alertas (toasts).
+ * Responsable: Ian (Login). Los colores replican los de las versiones de Tkinter y Swing.
+ * Sin estilos en línea en el HTML: el servidor manda una política CSP que solo permite archivos propios.
+ */
+
+:root {
+  --fondo: #f4f6f8;
+  --superficie: #ffffff;
+  --borde: #d9e2ec;
+  --texto: #1f2933;
+  --suave: #52606d;
+  --primario: #2563eb;
+  --primario-osc: #1d4ed8;
+  --peligro: #b42318;
+  --exito: #14532d;
+  --radio: 8px;
+
+  --pendiente-fondo: #fff4d6;
+  --pendiente-texto: #7a5200;
+  --en_proceso-fondo: #dbeafe;
+  --en_proceso-texto: #1e3a8a;
+  --enviado-fondo: #ede9fe;
+  --enviado-texto: #4c1d95;
+  --entregado-fondo: #dcfce7;
+  --entregado-texto: #14532d;
+  --cancelado-fondo: #f1f5f9;
+  --cancelado-texto: #64748b;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: var(--fondo);
+  color: var(--texto);
+  font: 14px/1.4 'Segoe UI', system-ui, -apple-system, 'Helvetica Neue', Arial, sans-serif;
+}
+
+h1,
+h2 {
+  margin: 0;
+}
+
+h2 {
+  font-size: 15px;
+}
+
+:focus-visible {
+  outline: 3px solid #93b4f5;
+  outline-offset: 2px;
+}
+
+/* ---------- controles ---------- */
+
+label {
+  display: block;
+  margin-bottom: 2px;
+  font-size: 13px;
+}
+
+input,
+select {
+  width: 100%;
+  min-height: 34px;
+  padding: 5px 8px;
+  border: 1px solid #9aa5b1;
+  border-radius: 6px;
+  background: var(--superficie);
+  color: inherit;
+  font: inherit;
+}
+
+input[aria-invalid='true'],
+select[aria-invalid='true'] {
+  border-color: var(--peligro);
+  background: #fff5f4;
+}
+
+input[type='checkbox'] {
+  width: auto;
+  min-height: 0;
+}
+
+.btn {
+  min-height: 34px;
+  padding: 5px 14px;
+  border: 1px solid var(--borde);
+  border-radius: 6px;
+  background: var(--superficie);
+  color: var(--texto);
+  font: inherit;
+  cursor: pointer;
+}
+
+.btn:hover:not(:disabled) {
+  background: #e8eef5;
+}
+
+.btn:disabled {
+  color: #9aa5b1;
+  cursor: not-allowed;
+}
+
+.btn--primario {
+  border-color: var(--primario);
+  background: var(--primario);
+  color: #fff;
+  font-weight: 600;
+}
+
+.btn--primario:hover:not(:disabled) {
+  background: var(--primario-osc);
+}
+
+.btn--primario:disabled {
+  border-color: #93b4f5;
+  background: #93b4f5;
+  color: #fff;
+}
+
+.btn--ancho {
+  width: 100%;
+}
+
+.suave {
+  color: var(--suave);
+}
+
+/* ---------- login ---------- */
+
+.login {
+  display: grid;
+  min-height: 100vh;
+  place-items: center;
+  padding: 16px;
+}
+
+.login__tarjeta {
+  width: min(420px, 100%);
+  padding: 32px;
+  border: 1px solid var(--borde);
+  border-radius: var(--radio);
+  background: var(--superficie);
+}
+
+.login__tarjeta h1 {
+  font-size: 24px;
+}
+
+.login__tarjeta p {
+  margin: 4px 0 20px;
+}
+
+.campo {
+  margin-bottom: 14px;
+}
+
+.campo--casilla {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.campo--casilla label {
+  margin: 0;
+}
+
+/* ---------- alertas (toasts) ---------- */
+
+/* Abajo a la derecha: arriba quedan el botón de cerrar sesión y los controles principales, que una
+   alerta larga no debe tapar. */
+.toasts {
+  position: fixed;
+  right: 16px;
+  bottom: 16px;
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: min(440px, calc(100vw - 32px));
+}
+
+.toast {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 12px 14px;
+  border-left: 5px solid var(--primario);
+  border-radius: var(--radio);
+  background: var(--superficie);
+  box-shadow: 0 6px 20px rgba(31, 41, 51, 0.22);
+  animation: entrar 0.18s ease-out;
+}
+
+.toast__icono {
+  flex: none;
+  font-weight: 700;
+}
+
+.toast__texto {
+  flex: 1;
+  white-space: pre-line;
+  overflow-wrap: anywhere;
+}
+
+.toast__cerrar {
+  flex: none;
+  border: 0;
+  background: none;
+  color: var(--suave);
+  font-size: 18px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.toast--aviso {
+  border-color: #d97706;
+}
+
+.toast--aviso .toast__icono {
+  color: #b45309;
+}
+
+.toast--error {
+  border-color: var(--peligro);
+}
+
+.toast--error .toast__icono {
+  color: var(--peligro);
+}
+
+.toast--ok {
+  border-color: #15803d;
+}
+
+.toast--ok .toast__icono {
+  color: #15803d;
+}
+
+@keyframes entrar {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .toast {
+    animation: none;
+  }
+}

@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Iniciar sesión · Sistema de pedidos</title>
+    <link rel="icon" href="data:," />
+    <link rel="stylesheet" href="/css/base.css" />
+  </head>
+  <body>
+    <main class="login">
+      <section class="login__tarjeta" aria-labelledby="titulo">
+        <h1 id="titulo">Sistema de pedidos</h1>
+        <p class="suave">Inicia sesión para continuar</p>
+
+        <!-- novalidate: las alertas las muestra la aplicación (toast), no los globos del navegador -->
+        <form id="form-login" novalidate>
+          <div class="campo">
+            <label for="usuario">Usuario</label>
+            <input id="usuario" name="usuario" type="text" autocomplete="username" autofocus />
+          </div>
+          <div class="campo">
+            <label for="contrasena">Contraseña</label>
+            <input id="contrasena" name="contrasena" type="password" autocomplete="current-password" />
+          </div>
+          <div class="campo campo--casilla">
+            <input id="mostrar" type="checkbox" />
+            <label for="mostrar">Mostrar contraseña</label>
+          </div>
+          <button id="btn-ingresar" class="btn btn--primario btn--ancho" type="submit">Ingresar</button>
+        </form>
+      </section>
+    </main>
+
+    <script type="module" src="/js/login.js"></script>
+  </body>
+</html>
