@@ -36,6 +36,8 @@ ProyectoFinalLenguajes/
 │   ├── ANALISIS_COMPARATIVO.html                         # fuente del análisis comparativo
 │   ├── PLAN_GITHUB_GUI.md                                # plan de trabajo en GitHub (ramas, commits y reparto)
 │   └── analisis-comparativo.pdf                          # análisis comparativo escrito (entregable)
+├── evidencias/                                           # capturas y videos de las interfaces
+│   └── .gitkeep                                          # solo mantiene la carpeta en Git; se puede borrar al subir la primera evidencia
 ├── java/                                                 # implementación en Java (Maven, Swing)
 │   ├── .mvn/                                             # Maven Wrapper (no hace falta instalar Maven)
 │   │   └── wrapper/
@@ -202,8 +204,9 @@ ProyectoFinalLenguajes/
 └── abrir_dashboard.bat                                   # doble clic: abre el dashboard comparativo sin servidor
 ```
 
-`evidencias/` (capturas o videos) todavía no existe porque no hay ninguno en el proyecto. Las carpetas `node_modules/`,
-`java/target/` y `__pycache__/` no se suben a Git: se regeneran solas (ver [Requisitos](#requisitos)).
+`evidencias/` es la carpeta para las capturas y los videos de las interfaces (por ahora solo tiene un `.gitkeep`, que
+mantiene la carpeta en Git). Las carpetas `node_modules/`, `java/target/` y `__pycache__/` no se suben a Git: se
+regeneran solas (ver [Requisitos](#requisitos)).
 
 ## Qué hace
 
