@@ -1,0 +1,21 @@
+{
+  "name": "tienda-pedidos",
+  "version": "1.0.0",
+  "description": "Automatización de pedidos de una tienda (implementación en JavaScript: consola e interfaz web con Express)",
+  "private": true,
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "consola": "node index.js",
+    "test": "jest"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "devDependencies": {
+    "jest": "^29.7.0"
+  },
+  "dependencies": {
+    "express": "^5.3.0"
+  }
+}
