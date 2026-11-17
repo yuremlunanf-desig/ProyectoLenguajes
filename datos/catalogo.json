@@ -1,0 +1,13 @@
+{
+  "productos": [
+    { "sku": "TEC-101", "nombre": "Teclado mecánico", "precio": 899.50 },
+    { "sku": "MOU-202", "nombre": "Mouse inalámbrico", "precio": 349.90 },
+    { "sku": "AUD-303", "nombre": "Audífonos Bluetooth", "precio": 615.33 },
+    { "sku": "CAB-404", "nombre": "Cable USB-C", "precio": 89.99 },
+    { "sku": "MON-505", "nombre": "Monitor 27 pulgadas", "precio": 3299.00 },
+    { "sku": "SOP-606", "nombre": "Soporte para monitor", "precio": 450.50 },
+    { "sku": "USB-707", "nombre": "Memoria USB 64 GB", "precio": 129.90 },
+    { "sku": "FUN-808", "nombre": "Funda para laptop", "precio": 245.00 },
+    { "sku": "WEB-909", "nombre": "Webcam HD", "precio": 799.00 }
+  ]
+}

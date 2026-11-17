@@ -1,0 +1,6 @@
+{
+  "usuarios": [
+    { "usuario": "admin", "password": "1234", "nombre": "Administrador" },
+    { "usuario": "operador", "password": "ventas", "nombre": "Operador de ventas" }
+  ]
+}

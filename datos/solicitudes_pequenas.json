@@ -1,0 +1,68 @@
+{
+  "pedidos": [
+    {
+      "id": "PED-001",
+      "caso": "Cliente regular con subtotal >= $2,000: descuento del 10%, envío estándar",
+      "cliente": { "id": "C001", "nombre": "Ana Torres", "tipo": "REGULAR" },
+      "fecha": "2026-11-03T10:15:00",
+      "prioridad": "MEDIA",
+      "estado": "PENDIENTE",
+      "envio": "ESTANDAR",
+      "productos": [
+        { "sku": "TEC-101", "nombre": "Teclado mecánico", "precio": 899.50, "cantidad": 2 },
+        { "sku": "MOU-202", "nombre": "Mouse inalámbrico", "precio": 349.90, "cantidad": 1 }
+      ]
+    },
+    {
+      "id": "PED-002",
+      "caso": "Cliente frecuente con subtotal < $2,000: descuento del 5%, envío express",
+      "cliente": { "id": "C002", "nombre": "Luis Méndez", "tipo": "FRECUENTE" },
+      "fecha": "2026-11-01T09:00:00",
+      "prioridad": "ALTA",
+      "estado": "PENDIENTE",
+      "envio": "EXPRESS",
+      "productos": [
+        { "sku": "AUD-303", "nombre": "Audífonos Bluetooth", "precio": 615.33, "cantidad": 1 },
+        { "sku": "CAB-404", "nombre": "Cable USB-C", "precio": 89.99, "cantidad": 3 }
+      ]
+    },
+    {
+      "id": "PED-003",
+      "caso": "Cliente frecuente con subtotal >= $2,000: solo aplica el 10% (no acumulable)",
+      "cliente": { "id": "C003", "nombre": "Sofía Ramírez", "tipo": "FRECUENTE" },
+      "fecha": "2026-11-05T16:40:00",
+      "prioridad": "ALTA",
+      "estado": "EN_PROCESO",
+      "envio": "EXPRESS",
+      "productos": [
+        { "sku": "MON-505", "nombre": "Monitor 27 pulgadas", "precio": 3299.00, "cantidad": 1 },
+        { "sku": "SOP-606", "nombre": "Soporte para monitor", "precio": 450.50, "cantidad": 1 }
+      ]
+    },
+    {
+      "id": "PED-004",
+      "caso": "Cliente regular con subtotal < $2,000: sin descuento, envío estándar",
+      "cliente": { "id": "C001", "nombre": "Ana Torres", "tipo": "REGULAR" },
+      "fecha": "2026-11-02T13:30:00",
+      "prioridad": "BAJA",
+      "estado": "ENVIADO",
+      "envio": "ESTANDAR",
+      "productos": [
+        { "sku": "USB-707", "nombre": "Memoria USB 64 GB", "precio": 129.90, "cantidad": 4 },
+        { "sku": "FUN-808", "nombre": "Funda para laptop", "precio": 245.00, "cantidad": 1 }
+      ]
+    },
+    {
+      "id": "PED-005",
+      "caso": "Pedido inválido: cantidad 0, debe rechazarse",
+      "cliente": { "id": "C004", "nombre": "Diego Castro", "tipo": "REGULAR" },
+      "fecha": "2026-11-04T11:05:00",
+      "prioridad": "MEDIA",
+      "estado": "PENDIENTE",
+      "envio": "ESTANDAR",
+      "productos": [
+        { "sku": "WEB-909", "nombre": "Webcam HD", "precio": 799.00, "cantidad": 0 }
+      ]
+    }
+  ]
+}

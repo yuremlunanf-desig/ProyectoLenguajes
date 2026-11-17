@@ -1,0 +1,36 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.pytest_cache/
+.venv/
+venv/
+
+# Java
+java/target/
+*.class
+
+# JavaScript
+node_modules/
+coverage/
+
+# Salidas generadas que no se versionan
+tablero-estatico/
+datos/_volumenes_temporal/
+
+# Editores
+.idea/
+.vscode/
+*.iml
+
+# Archivos temporales del sistema y copias de respaldo
+.DS_Store
+Thumbs.db
+desktop.ini
+*.tmp
+*.temp
+*.log
+*.swp
+*~
+*.bak
+.env
