@@ -1,0 +1,183 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Pedidos de la tienda</title>
+    <link rel="icon" href="data:," />
+    <link rel="stylesheet" href="/css/base.css" />
+    <link rel="stylesheet" href="/css/dashboard.css" />
+  </head>
+  <body>
+    <header class="barra">
+      <h1>Pedidos de la tienda</h1>
+      <div class="barra__sesion">
+        <span id="usuario-actual" class="suave"></span>
+        <button id="btn-logout" class="btn" type="button">Cerrar sesión</button>
+      </div>
+    </header>
+
+    <main class="panel">
+      <!-- ===== Formulario de pedidos (Edsson) ===== -->
+      <section id="formulario" class="tarjeta" aria-labelledby="t-formulario">
+        <h2 id="t-formulario">Nuevo pedido</h2>
+        <form id="form-pedido" novalidate>
+          <div class="fila fila--2">
+            <div>
+              <label for="cliente-id">ID cliente</label>
+              <input id="cliente-id" type="text" autocomplete="off" />
+            </div>
+            <div>
+              <label for="cliente-nombre">Nombre</label>
+              <input id="cliente-nombre" type="text" autocomplete="off" />
+            </div>
+          </div>
+          <div class="fila fila--3">
+            <div>
+              <label for="tipo-cliente">Tipo de cliente</label>
+              <select id="tipo-cliente"></select>
+            </div>
+            <div>
+              <label for="prioridad">Prioridad</label>
+              <select id="prioridad"></select>
+            </div>
+            <div>
+              <label for="envio">Envío</label>
+              <select id="envio"></select>
+            </div>
+          </div>
+          <hr />
+          <div class="fila">
+            <div>
+              <label for="producto">Producto</label>
+              <select id="producto"></select>
+            </div>
+          </div>
+          <div class="fila fila--cantidad">
+            <div>
+              <label for="cantidad">Cantidad</label>
+              <input id="cantidad" type="text" inputmode="numeric" value="1" autocomplete="off" />
+            </div>
+            <button id="btn-agregar" class="btn" type="button">Agregar al carrito</button>
+          </div>
+
+          <div class="desplazable desplazable--carrito">
+            <table id="tabla-carrito" class="tabla">
+              <thead>
+                <tr>
+                  <th scope="col">Producto</th>
+                  <th scope="col" class="centro">Cant.</th>
+                  <th scope="col" class="num">Importe</th>
+                </tr>
+              </thead>
+              <tbody></tbody>
+            </table>
+          </div>
+          <div class="acciones">
+            <button id="btn-quitar" class="btn" type="button">Quitar línea</button>
+            <button id="btn-vaciar" class="btn" type="button">Vaciar carrito</button>
+          </div>
+
+          <dl class="totales" aria-label="Importes del carrito">
+            <dt>Subtotal</dt>
+            <dd id="imp-subtotal">—</dd>
+            <dt>Descuento</dt>
+            <dd id="imp-descuento">—</dd>
+            <dt>IVA</dt>
+            <dd id="imp-iva">—</dd>
+            <dt>Envío</dt>
+            <dd id="imp-envio">—</dd>
+            <dt class="total">Total</dt>
+            <dd id="imp-total" class="total">—</dd>
+          </dl>
+
+          <button id="btn-registrar" class="btn btn--primario btn--ancho" type="submit">Registrar pedido</button>
+        </form>
+      </section>
+
+      <div class="columna">
+        <!-- ===== Indicadores, filtros y tabla (Leonardo) ===== -->
+        <section id="kpis" class="kpis" aria-label="Resumen de pedidos"></section>
+
+        <section class="filtros" aria-label="Filtros de la tabla">
+          <div>
+            <label for="buscar">Buscar cliente</label>
+            <input id="buscar" type="search" autocomplete="off" />
+          </div>
+          <div>
+            <label for="filtro-estado">Estado</label>
+            <select id="filtro-estado"></select>
+          </div>
+          <div>
+            <label for="orden">Ordenar por</label>
+            <select id="orden"></select>
+          </div>
+          <button id="btn-limpiar" class="btn" type="button">Limpiar</button>
+          <span class="espacio"></span>
+          <button id="btn-restablecer" class="btn" type="button">Restablecer datos</button>
+        </section>
+
+        <section class="tarjeta" aria-labelledby="t-tabla">
+          <h2 id="t-tabla">Pedidos <span class="suave">(doble clic o Enter en una fila para ver el desglose)</span></h2>
+          <div class="desplazable desplazable--pedidos">
+            <table id="tabla-pedidos" class="tabla tabla--pedidos">
+              <thead>
+                <tr></tr>
+              </thead>
+              <tbody></tbody>
+            </table>
+          </div>
+        </section>
+
+        <!-- ===== Despachador y tiempo real (Yurem) ===== -->
+        <section id="concurrencia" class="tarjeta" aria-labelledby="t-concurrencia">
+          <h2 id="t-concurrencia">Despachador de pedidos (concurrencia)</h2>
+          <div class="controles">
+            <div>
+              <label for="retardo">Retardo por transición (ms)</label>
+              <input id="retardo" type="number" step="50" />
+            </div>
+            <div>
+              <label for="trabajadores">Trabajadores simultáneos</label>
+              <input id="trabajadores" type="number" step="1" />
+            </div>
+            <button id="btn-procesar" class="btn btn--primario" type="button">Procesar cola</button>
+            <button id="btn-detener" class="btn" type="button" disabled>Detener</button>
+          </div>
+
+          <div class="cola">
+            <div class="desplazable desplazable--cola">
+              <table id="tabla-cola" class="tabla">
+                <thead>
+                  <tr>
+                    <th scope="col" class="centro">#</th>
+                    <th scope="col">Pedido</th>
+                    <th scope="col">Prioridad</th>
+                    <th scope="col">Trabajador</th>
+                    <th scope="col">Progreso</th>
+                    <th scope="col">Estado</th>
+                  </tr>
+                </thead>
+                <tbody></tbody>
+              </table>
+            </div>
+            <ol id="registro" class="registro" aria-label="Registro de eventos del despachador"></ol>
+          </div>
+
+          <progress id="avance" class="avance" max="1" value="0" aria-label="Avance de la corrida"></progress>
+          <p id="estado-despachador" class="estado-despachador" role="status">Cargando…</p>
+        </section>
+      </div>
+    </main>
+
+    <footer id="mensaje" class="pie" role="status" aria-live="polite">Listo.</footer>
+
+    <dialog id="dialogo-detalle" aria-labelledby="detalle-titulo">
+      <h2 id="detalle-titulo">Detalle del pedido</h2>
+      <pre id="detalle-texto"></pre>
+      <button id="btn-cerrar-detalle" class="btn btn--primario" type="button">Cerrar</button>
+    </dialog>
+
+    <script type="module" src="/js/dashboard.js"></script>
+  </body>
+</html>
